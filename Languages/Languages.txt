@@ -1,6 +1,7 @@
 de
 fi
 fr
+hu
 it
 ja
 ko

@@ -1,0 +1,2773 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 1900-01-01 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Magyar <LL@li.org>\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4.2\n"
+
+
+# msgid/msgstr fields for Accelerator keys
+# Format is: "ID:xxxxxx:VACS+X" where:
+#    ID:xxxxx = the menu ID corresponding to the accelerator
+#    V = Virtual key (or blank if not used) - nearly always set!
+#    A = Alt key     (or blank if not used)
+#    C = Ctrl key    (or blank if not used)
+#    S = Shift key   (or blank if not used)
+#    X = upper case character
+# e.g. "V CS+Q" == Ctrl + Shift + 'Q'
+
+# ONLY Accelerator Keys with corresponding alphanumeric characters can be
+# updated i.e. function keys (F2), special keys (Delete, HoMe) etc. will not.
+
+# ONLY change the msgstr field. Do NOT change any other.
+# If you do not want to change an Accelerator Key, copy msgid to msgstr
+
+#. Resource IDs: (254)
+#, c-format
+msgid "%%i%%c%06Xno selection"
+msgstr "%%i%%c%06Xnincs kijelölés"
+
+#. Resource IDs: (224)
+#, c-format
+msgid "%d occurrences were replaced."
+msgstr "%d előfordulás cserélve."
+
+#. Resource IDs: (170)
+#, c-format
+msgid "%s (copy).%s"
+msgstr "%s (másolat).%s"
+
+#. Resource IDs: (110)
+msgid "&Cancel"
+msgstr "&Mégse"
+
+#. Resource IDs: (1)
+msgid "&Capture"
+msgstr "&Rögzítés"
+
+#. Resource IDs: (1)
+msgid "&Close"
+msgstr "&Bezárás"
+
+#. Resource IDs: (60066)
+msgid "&Close Tab"
+msgstr "Lap &bezárása"
+
+#. Resource IDs: (185)
+msgid "&Edit"
+msgstr "&Szerkesztés"
+
+#. Resource IDs: (1001)
+msgid "&Find"
+msgstr "&Keresés"
+
+#. Resource IDs: (60032)
+msgid "&New"
+msgstr "&Új"
+
+#. Resource IDs: (60042)
+msgid "&Open"
+msgstr "&Megnyitás"
+
+#. Resource IDs: (60354)
+msgid "&Reload"
+msgstr "Újratöltés"
+
+#. Resource IDs: (1106)
+msgid "&Remove duplicate lines"
+msgstr "Ismétlődő sorok eltávolítása"
+
+#. Resource IDs: (1003)
+msgid "&Replace"
+msgstr "&Csere"
+
+#. Resource IDs: (107, 1126, 60047)
+msgid "&Save"
+msgstr "&Mentés"
+
+#. Resource IDs: (1081)
+msgid "&Search for:"
+msgstr "&Keresés:"
+
+#. Resource IDs: (1083)
+msgid "&Sort Order:"
+msgstr "&Rendezési sorrend:"
+
+#. Resource IDs: (1007)
+msgid "&Whole word"
+msgstr "&Teljes szó"
+
+#. Resource IDs: (1074)
+msgid "."
+msgstr "."
+
+#. Resource IDs: (1069)
+msgid "..."
+msgstr "..."
+
+#. Resource IDs: (1080)
+msgid "<"
+msgstr "<"
+
+#. Resource IDs: (133)
+msgid "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Full details about this update</a>"
+msgstr "<a href=\"http://tools.stefankueng.com/BowPad_history.html\">Teljes részletek a frissítésről</a>"
+
+#. Resource IDs: (1135)
+msgid "<a>(?)</a>"
+msgstr "<a>(?)</a>"
+
+#. Resource IDs: (60053)
+msgid "A"
+msgstr "A"
+
+#. Resource IDs: (60539)
+msgid "AB"
+msgstr "AB"
+
+#. Resource IDs: (1070)
+msgid "ANSI / Local encoding"
+msgstr "ANSI / Helyi kódolás"
+
+#. Resource IDs: (60062)
+msgid "AS"
+msgstr "AS"
+
+#. Resource IDs: (103)
+msgid "About BowPad"
+msgstr "A BowPad névjegye"
+
+#. Resource IDs: (145)
+msgid "Access denied!"
+msgstr "Hozzáférés megtagadva!"
+
+#. Resource IDs: (146)
+#, c-format
+msgid "Access to the file '%s' was denied. Do you want to try again with elevated privileges?"
+msgstr "A '%s' fájlhoz való hozzáférés megtagadva. Próbálja újra emelt jogosultságokkal?"
+
+#. Resource IDs: (1113)
+msgid "Add newline to capture"
+msgstr "Új sor hozzáadása a rögzítéshez"
+
+#. Resource IDs: (265)
+msgid "Add to quick access toolbar"
+msgstr "Hozzáadás a gyorselérési eszköztárhoz"
+
+#. Resource IDs: (217)
+msgid "Add word to dictionary"
+msgstr "Szó hozzáadása a szótárhoz"
+
+#. Resource IDs: (255, 60654)
+msgid "Advanced Settings"
+msgstr "Speciális beállítások"
+
+#. Resource IDs: (60563)
+msgid "All plugin commands are listed here"
+msgstr "Minden bővítményparancs itt található"
+
+#. Resource IDs: (60141)
+msgid "Allows to load a file with a specific encoding"
+msgstr "Lehetővé teszi egy fájl betöltését meghatározott kódolással"
+
+#. Resource IDs: (131)
+msgid "An update for BowPad is available"
+msgstr "Frissítés érhető el a BowPad számára"
+
+#. Resource IDs: (1126)
+msgid "Apply/Add"
+msgstr "Alkalmaz/Hozzáad"
+
+#. Resource IDs: (172)
+#, c-format
+msgid "Are you sure you want to delete the file '%s'?"
+msgstr "Biztosan törölni szeretné a '%s' fájlt?"
+
+#. Resource IDs: (165)
+#, c-format
+msgid "Are you sure you want to reload '%s'?"
+msgstr "Biztosan újra szeretné tölteni '%s'-t?"
+
+#. Resource IDs: (204)
+msgid "Ascending (A-Z)"
+msgstr "Növekvő (A-Z)"
+
+#. Resource IDs: (60064)
+msgid "Asks where to save the current tab"
+msgstr "Megkérdezi, hová mentse az aktuális lapot"
+
+#. Resource IDs: (65535)
+msgid "Author: Stefan Küng"
+msgstr "Szerző: Stefan Küng"
+
+#. Resource IDs: (60538, 60540)
+msgid "Auto Braces"
+msgstr "Automatikus zárójelek"
+
+#. Resource IDs: (60057, 60058)
+msgid "Auto save"
+msgstr "Automatikus mentés"
+
+#. Resource IDs: (60498)
+msgid "Auto-save on close"
+msgstr "Automatikus mentés bezáráskor"
+
+#. Resource IDs: (60500)
+msgid "Auto-saves modified files"
+msgstr "Automatikusan menti a módosított fájlokat"
+
+#. Resource IDs: (60501)
+msgid "Auto-saves modified files when the session closes and restores the modified state on load"
+msgstr "Automatikusan menti a módosított fájlokat a munkamenet bezárásakor, és visszaállítja a módosított állapotot betöltéskor"
+
+#. Resource IDs: (60645)
+msgid "Autocomplete"
+msgstr "Automatikus kiegészítés"
+
+#. Resource IDs: (135)
+msgid "Available Languages"
+msgstr "Elérhető nyelvek"
+
+#. Resource IDs: (1075)
+msgid "Available plugins"
+msgstr "Elérhető bővítmények"
+
+#. Resource IDs: (60371)
+msgid "BC"
+msgstr "BC"
+
+#. Resource IDs: (60376)
+msgid "BN"
+msgstr "BN"
+
+#. Resource IDs: (109)
+msgid "BOWPAD"
+msgstr "BOWPAD"
+
+#. Resource IDs: (60381)
+msgid "BP"
+msgstr "BP"
+
+#. Resource IDs: (60366)
+msgid "BT"
+msgstr "BT"
+
+#. Resource IDs: (1020)
+msgid "Bold"
+msgstr "Félkövér"
+
+#. Resource IDs: (60365)
+msgid "Bookmark"
+msgstr "Könyvjelző"
+
+#. Resource IDs: (60361, 60363)
+msgid "Bookmarks"
+msgstr "Könyvjelzők"
+
+#. Resource IDs: (103)
+msgid "BowPad"
+msgstr "BowPad"
+
+#. Resource IDs: (130)
+msgid "BowPad Text Editor"
+msgstr "BowPad szövegszerkesztő"
+
+#. Resource IDs: (260)
+msgid "BowPad lexer file"
+msgstr "BowPad lexer fájl"
+
+#. Resource IDs: (283)
+msgid "Bowpad entry added to the Windows 11 explorer context menu"
+msgstr "BowPad bejegyzés hozzáadva a Windows 11 Intéző helyi menüjéhez"
+
+#. Resource IDs: (284)
+msgid "Bowpad entry removed from the Windows 11 explorer context menu"
+msgstr "BowPad bejegyzés eltávolítva a Windows 11 Intéző helyi menüjéből"
+
+#. Resource IDs: (60011, 60067, 60082)
+msgid "C"
+msgstr "C"
+
+#. Resource IDs: (60072, 60646)
+msgid "CA"
+msgstr "CA"
+
+#. Resource IDs: (60223)
+msgid "CC"
+msgstr "CC"
+
+#. Resource IDs: (60023)
+msgid "CO"
+msgstr "CO"
+
+#. Resource IDs: (60159)
+msgid "CR"
+msgstr "CR"
+
+#. Resource IDs: (60145)
+msgid "CT"
+msgstr "CT"
+
+#. Resource IDs: (60229)
+msgid "CU"
+msgstr "CU"
+
+#. Resource IDs: (2)
+msgid "Cancel"
+msgstr "Mégse"
+
+#. Resource IDs: (174)
+msgid "Cancel\nDo not delete the file."
+msgstr "Mégse\nNe törölje a fájlt."
+
+#. Resource IDs: (223)
+msgid "Cancel\nLeave the file where it is."
+msgstr "Mégse\nHagyja a fájlt ahol van."
+
+#. Resource IDs: (164)
+msgid "Cancel\nThe file is not created."
+msgstr "Mégse\nA fájl nem jön létre."
+
+#. Resource IDs: (122)
+msgid "Cancel\nThe file is not loaded again."
+msgstr "Mégse\nA fájl nem töltődik be újra."
+
+#. Resource IDs: (167)
+msgid "Cancel\nThe unsaved modifications will be kept."
+msgstr "Mégse\nA nem mentett módosítások megmaradnak."
+
+#. Resource IDs: (247, 60201)
+msgid "Capture Regex"
+msgstr "Reguláris kifejezés rögzítése"
+
+#. Resource IDs: (60203)
+msgid "Capture regular expressions"
+msgstr "Reguláris kifejezések rögzítése"
+
+#. Resource IDs: (1104)
+msgid "Case insensitive"
+msgstr "Kis- és nagybetű érzéketlen"
+
+#. Resource IDs: (60234)
+msgid "Change Case"
+msgstr "Kis-/nagybetű váltás"
+
+#. Resource IDs: (1062)
+msgid "Check a plugin to install it, uncheck it to deinstall it."
+msgstr "Jelölje be a bővítményt a telepítéshez, törölje a jelölését az eltávolításhoz."
+
+#. Resource IDs: (1027)
+msgid "Check for Updates"
+msgstr "Frissítések keresése"
+
+#. Resource IDs: (60633)
+msgid "Check for errors only in comments, strings and text"
+msgstr "Hibák keresése csak a megjegyzésekben, karakterláncokban és szövegben"
+
+#. Resource IDs: (268)
+msgid "Check for updates"
+msgstr "Frissítések keresése"
+
+#. Resource IDs: (60627)
+msgid "Check spelling"
+msgstr "Helyesírás-ellenőrzés"
+
+#. Resource IDs: (65535)
+msgid "Chose the encoding of new files"
+msgstr "Válassza ki az új fájlok kódolását"
+
+#. Resource IDs: (65535)
+msgid "Chose the line ending of new files"
+msgstr "Válassza ki az új fájlok sorvégeinek típusát"
+
+#. Resource IDs: (60370, 60372)
+msgid "Clear Bookmarks"
+msgstr "Könyvjelzők törlése"
+
+#. Resource IDs: (60670)
+msgid "Clear all styles"
+msgstr "Összes stílus törlése"
+
+#. Resource IDs: (60010, 60083, 60088, 60093, 60098)
+msgid "Clipboard"
+msgstr "Vágólap"
+
+#. Resource IDs: (2)
+msgid "Close"
+msgstr "Bezárás"
+
+#. Resource IDs: (60073)
+msgid "Close All Tabs"
+msgstr "Minden lap bezárása"
+
+#. Resource IDs: (60510)
+msgid "Close All Tabs Except This One"
+msgstr "Összes lap bezárása kivéve ezt"
+
+#. Resource IDs: (60068)
+msgid "Close Tab"
+msgstr "Lap bezárása"
+
+#. Resource IDs: (60071)
+msgid "Close all"
+msgstr "Összes bezárása"
+
+#. Resource IDs: (60509)
+msgid "Close all but this"
+msgstr "Összes bezárása kivéve ezt"
+
+#. Resource IDs: (60069)
+msgid "Close the current tab"
+msgstr "Az aktuális lap bezárása"
+
+#. Resource IDs: (126)
+msgid "Close the document\nThe document tab is closed."
+msgstr "A dokumentum bezárása\nA dokumentum lapja bezárásra kerül."
+
+#. Resource IDs: (60074)
+msgid "Closes all open files"
+msgstr "Bezárja az összes nyitott fájlt"
+
+#. Resource IDs: (60511)
+msgid "Closes all open files except the current one"
+msgstr "Bezárja az összes nyitott fájlt, kivéve az aktuálist"
+
+#. Resource IDs: (60409)
+msgid "Cmd"
+msgstr "Parancs"
+
+#. Resource IDs: (60022)
+msgid "Code"
+msgstr "Kód"
+
+#. Resource IDs: (256)
+msgid "Code Snippets"
+msgstr "Kódrészletek"
+
+#. Resource IDs: (113)
+msgid "Codepages/Character sets"
+msgstr "Kódlapok/Karakterkészletek"
+
+#. Resource IDs: (65535)
+msgid "Color"
+msgstr "Szín"
+
+#. Resource IDs: (1061)
+msgid "Command Line:"
+msgstr "Parancssor:"
+
+#. Resource IDs: (1060)
+msgid "Command Name:"
+msgstr "Parancs neve:"
+
+#. Resource IDs: (60222, 60224)
+msgid "Comment"
+msgstr "Megjegyzés"
+
+#. Resource IDs: (60225)
+msgid "Comments the selected text"
+msgstr "Megjegyzéssé alakítja a kijelölt szöveget"
+
+#. Resource IDs: (60650, 60651)
+msgid "Configure Code Snippets"
+msgstr "Kódrészletek konfigurálása"
+
+#. Resource IDs: (60534)
+msgid "Configure Keyboard Shortcuts"
+msgstr "Gyorsbillentyűk konfigurálása"
+
+#. Resource IDs: (154, 60558)
+msgid "Configure Plugins"
+msgstr "Bővítmények konfigurálása"
+
+#. Resource IDs: (60533)
+msgid "Configure Shortcuts"
+msgstr "Gyorsbillentyűk konfigurálása"
+
+#. Resource IDs: (60212, 60214)
+msgid "Configure Styles"
+msgstr "Stílusok konfigurálása"
+
+#. Resource IDs: (60215)
+msgid "Configure colors, fonts, styles and sizes"
+msgstr "Színek, betűtípusok, stílusok és méretek konfigurálása"
+
+#. Resource IDs: (60484, 60485)
+msgid "Configure custom commands"
+msgstr "Egyéni parancsok konfigurálása"
+
+#. Resource IDs: (60557)
+msgid "Configure plugins"
+msgstr "Bővítmények konfigurálása"
+
+#. Resource IDs: (60144, 60146)
+msgid "Convert to"
+msgstr "Átalakítás erre:"
+
+#. Resource IDs: (60352)
+msgid "Converts all spaces in the document to tabs"
+msgstr "Az összes szóközt tabulátorokká alakítja a dokumentumban"
+
+#. Resource IDs: (60347)
+msgid "Converts all tabs in the document to spaces"
+msgstr "Az összes tabulátort szóközökké alakítja a dokumentumban"
+
+#. Resource IDs: (60147)
+msgid "Converts the file to the specified encoding"
+msgstr "A fájlt a megadott kódolásra alakítja"
+
+#. Resource IDs: (60249)
+msgid "Converts the selection to Title Case"
+msgstr "A kijelölt szöveget Címként írt szöveggé alakítja"
+
+#. Resource IDs: (60239)
+msgid "Converts the selection to UPPERcase"
+msgstr "A kijelölt szöveget NAGYBETŰSSÉ alakítja"
+
+#. Resource IDs: (60244)
+msgid "Converts the selection to lowercase"
+msgstr "A kijelölt szöveget kisbetűssé alakítja"
+
+#. Resource IDs: (60519)
+msgid "Copies the name of the current file to the clipboard"
+msgstr "Az aktuális fájl nevét másolja a vágólapra"
+
+#. Resource IDs: (60515)
+msgid "Copies the path of the current file to the clipboard"
+msgstr "Az aktuális fájl elérési útját másolja a vágólapra"
+
+#. Resource IDs: (60523)
+msgid "Copies the path of the directory of the current file to the clipboard"
+msgstr "Az aktuális fájl könyvtárának elérési útját másolja a vágólapra"
+
+#. Resource IDs: (60081)
+msgid "Copy"
+msgstr "Másolás"
+
+#. Resource IDs: (60521, 60522)
+msgid "Copy Directory"
+msgstr "Könyvtár másolása"
+
+#. Resource IDs: (60517, 60518)
+msgid "Copy Name"
+msgstr "Név másolása"
+
+#. Resource IDs: (60513, 60514)
+msgid "Copy Path"
+msgstr "Útvonal másolása"
+
+#. Resource IDs: (60084)
+msgid "Copy the current selection to the clipboard. Hold down the shift key to copy the text formatted."
+msgstr "Az aktuális kijelölést másolja a vágólapra. Nyomva tartja a shift billentyűt a formázott szöveg másolásához."
+
+#. Resource IDs: (221)
+msgid "Copy the file\nThe copy is opened in another tab."
+msgstr "A fájl másolása\nA másolat egy másik lapon nyílik meg."
+
+#. Resource IDs: (60629)
+msgid "Correct spelling mistakes"
+msgstr "Helyesírási hibák javítása"
+
+#. Resource IDs: (213)
+msgid "Corrections"
+msgstr "Javítások"
+
+#. Resource IDs: (60676)
+msgid "Corresponding File"
+msgstr "Megfelelő fájl"
+
+#. Resource IDs: (194)
+msgid "Corresponding Files"
+msgstr "Megfelelő fájlok"
+
+#. Resource IDs: (141)
+msgid "Could not download the language file!"
+msgstr "A nyelvi fájl letöltése sikertelen!"
+
+#. Resource IDs: (201)
+#, c-format
+msgid "Create '%s'"
+msgstr "'%s' létrehozása"
+
+#. Resource IDs: (202)
+msgid "Create Corresponding File"
+msgstr "Megfelelő fájl létrehozása"
+
+#. Resource IDs: (238)
+msgid "Create corresponding files"
+msgstr "Megfelelő fájlok létrehozása"
+
+#. Resource IDs: (1089)
+msgid "Create files on OK."
+msgstr "Fájlok létrehozása az OK gombbal."
+
+#. Resource IDs: (163)
+msgid "Create\nAn empty file is created."
+msgstr "Létrehozás\nEgy üres fájl jön létre."
+
+#. Resource IDs: (60553)
+msgid "Creates a copy of the current tab"
+msgstr "Létrehoz egy másolatot az aktuális lapról"
+
+#. Resource IDs: (60035)
+msgid "Creates a new tab with an empty document"
+msgstr "Létrehoz egy új lapot egy üres dokumentummal"
+
+#. Resource IDs: (114)
+msgid "Ctrl+click to follow URL\nor click here"
+msgstr "Ctrl+kattintás a URL követéséhez\nvagy kattintson ide"
+
+#. Resource IDs: (259)
+#, c-format
+msgid "Custom Command %d"
+msgstr "Egyéni parancs %d"
+
+#. Resource IDs: (1049, 60454)
+msgid "Custom Command 0"
+msgstr "Egyéni parancs 0"
+
+#. Resource IDs: (1050, 60457)
+msgid "Custom Command 1"
+msgstr "Egyéni parancs 1"
+
+#. Resource IDs: (1051, 60460)
+msgid "Custom Command 2"
+msgstr "Egyéni parancs 2"
+
+#. Resource IDs: (1052, 60463)
+msgid "Custom Command 3"
+msgstr "Egyéni parancs 3"
+
+#. Resource IDs: (1053, 60466)
+msgid "Custom Command 4"
+msgstr "Egyéni parancs 4"
+
+#. Resource IDs: (1054, 60469)
+msgid "Custom Command 5"
+msgstr "Egyéni parancs 5"
+
+#. Resource IDs: (1055, 60472)
+msgid "Custom Command 6"
+msgstr "Egyéni parancs 6"
+
+#. Resource IDs: (1056, 60475)
+msgid "Custom Command 7"
+msgstr "Egyéni parancs 7"
+
+#. Resource IDs: (1057, 60478)
+msgid "Custom Command 8"
+msgstr "Egyéni parancs 8"
+
+#. Resource IDs: (1058, 60481)
+msgid "Custom Command 9"
+msgstr "Egyéni parancs 9"
+
+#. Resource IDs: (149)
+msgid "Custom Commands"
+msgstr "Egyéni parancsok"
+
+#. Resource IDs: (60086)
+msgid "Cut"
+msgstr "Kivágás"
+
+#. Resource IDs: (60089)
+msgid "Cut the current selection to the clipboard. Hold down the shift key to cut the text formatted."
+msgstr "Az aktuális kijelölést kivágja a vágólapra. Nyomva tartja a shift billentyűt a formázott szöveg kivágásához."
+
+#. Resource IDs: (60264)
+msgid "DD"
+msgstr "DD"
+
+#. Resource IDs: (60207)
+msgid "DEL"
+msgstr "DEL"
+
+#. Resource IDs: (60396)
+msgid "Dark"
+msgstr "Sötét"
+
+#. Resource IDs: (60398)
+msgid "Dark Theme"
+msgstr "Sötét téma"
+
+#. Resource IDs: (153)
+msgid "Defaults for new files"
+msgstr "Alapértelmezések új fájlokhoz"
+
+#. Resource IDs: (1129, 60206)
+msgid "Delete"
+msgstr "Törlés"
+
+#. Resource IDs: (60547, 60548)
+msgid "Delete File"
+msgstr "Fájl törlése"
+
+#. Resource IDs: (171)
+msgid "Delete file"
+msgstr "Fájl törlése"
+
+#. Resource IDs: (173)
+msgid "Delete\nThe file will be removed."
+msgstr "Törlés\nA fájl el lesz távolítva."
+
+#. Resource IDs: (60549)
+msgid "Deletes the file of the current tab"
+msgstr "Törli az aktuális lap fájlját"
+
+#. Resource IDs: (205)
+msgid "Descending (Z-A)"
+msgstr "Csökkenő (Z-A)"
+
+#. Resource IDs: (60259)
+msgid "Determines whether a tab is inserted or spaces when the tab key is pressed."
+msgstr "Meghatározza, hogy tabulátor vagy szóköz kerüljön be a tab billentyű lenyomásakor."
+
+#. Resource IDs: (129)
+msgid "Do &not download the update\nYou will be reminded again about the update in a week."
+msgstr "Ne &töltse le a frissítést\nEgy hét múlva újra emlékeztetjük a frissítésre."
+
+#. Resource IDs: (212)
+msgid "Do this for all files"
+msgstr "Minden fájlra alkalmazza ezt"
+
+#. Resource IDs: (219)
+#, c-format
+msgid "Do you want to copy the file '%s' to '%s'?"
+msgstr "Másolja a(z) '%s' fájlt '%s' helyre?"
+
+#. Resource IDs: (220)
+#, c-format
+msgid "Do you want to move the file '%s' to '%s'?"
+msgstr "Mozgassa a(z) '%s' fájlt '%s' helyre?"
+
+#. Resource IDs: (106)
+#, c-format
+msgid "Do you want to save changes to \"%s\"?"
+msgstr "Menti a módosításokat a(z) \"%s\" fájlba?"
+
+#. Resource IDs: (108)
+msgid "Do&n't save"
+msgstr "Ne mentsem"
+
+#. Resource IDs: (60570)
+msgid "Document Summary"
+msgstr "Dokumentum összefoglaló"
+
+#. Resource IDs: (116)
+msgid "Document modified"
+msgstr "Dokumentum módosítva"
+
+#. Resource IDs: (123)
+msgid "Document removed"
+msgstr "Dokumentum eltávolítva"
+
+#. Resource IDs: (150)
+msgid "Don't Save\nThe file is not saved."
+msgstr "Ne mentse\nA fájl nem kerül mentésre."
+
+#. Resource IDs: (148)
+msgid "Don't open\nThe file is not opened."
+msgstr "Ne nyissa meg\nA fájl nem nyílik meg."
+
+#. Resource IDs: (127)
+msgid "Download and install the update\nUpdates BowPad to the latest version."
+msgstr "Frissítés letöltése és telepítése\nA BowPad a legújabb verzióra frissül."
+
+#. Resource IDs: (140)
+msgid "Download of language list succeeded. Now you can select a language from that list."
+msgstr "A nyelvi lista letöltése sikeres. Most már kiválaszthat egy nyelvet a listából."
+
+#. Resource IDs: (128)
+msgid "Download the update\nYou have to install the update manually."
+msgstr "Frissítés letöltése\nA frissítést manuálisan kell telepítenie."
+
+#. Resource IDs: (275)
+msgid "Draws a frame around the current line"
+msgstr "Keretet rajzol az aktuális sor köré"
+
+#. Resource IDs: (255, 60654)
+msgid "Advanced Settings"
+msgstr "Speciális beállítások"
+
+#. Resource IDs: (60263, 60265)
+msgid "Duplicate Line"
+msgstr "Sor duplikálása"
+
+#. Resource IDs: (60266)
+msgid "Duplicates the current line"
+msgstr "Duplikálja az aktuális sort"
+
+#. Resource IDs: (60006)
+msgid "E"
+msgstr "E"
+
+#. Resource IDs: (60029)
+msgid "E&xit"
+msgstr "Kilépés"
+
+#. Resource IDs: (60136)
+msgid "ENC"
+msgstr "Kód"
+
+#. Resource IDs: (60156)
+msgid "EOL"
+msgstr "SORVÉG"
+
+#. Resource IDs: (60296)
+msgid "ES"
+msgstr "ES"
+
+#. Resource IDs: (60005)
+msgid "Edit"
+msgstr "Szerkesztés"
+
+#. Resource IDs: (60295)
+msgid "Edit Selection"
+msgstr "Kijelölés szerkesztése"
+
+#. Resource IDs: (60298)
+msgid "Edit all occurrences of the current selection at once"
+msgstr "Az aktuális kijelölés összes előfordulásának egyszerre történő szerkesztése"
+
+#. Resource IDs: (60658)
+msgid "Edit at end"
+msgstr "Szerkesztés a végén"
+
+#. Resource IDs: (60660)
+msgid "Edit at end of selected lines"
+msgstr "Szerkesztés a kijelölt sorok végén"
+
+#. Resource IDs: (187)
+msgid "Elevated"
+msgstr "Emelt szintű"
+
+#. Resource IDs: (60541)
+msgid "Enable to automatically add a closing brace when an opening brace is entered"
+msgstr "Engedélyezze a záró zárójel automatikus hozzáadását, amikor egy nyitó zárójel kerül beírásra"
+
+#. Resource IDs: (273)
+msgid "Enables hardware acceleration for drawing"
+msgstr "Hardveres gyorsítás engedélyezése a rajzoláshoz"
+
+#. Resource IDs: (60621)
+msgid "Enables/Disables the spell checker"
+msgstr "Engedélyezi/Letiltja a helyesírás-ellenőrzőt"
+
+#. Resource IDs: (60135)
+msgid "Encoding"
+msgstr "Kódolás"
+
+#. Resource IDs: (207)
+#, c-format
+msgid "Encoding: %s"
+msgstr "Kódolás: %s"
+
+#. Resource IDs: (264)
+msgid "Enter command name"
+msgstr "Adja meg a parancs nevét"
+
+#. Resource IDs: (65535)
+msgid "Extension"
+msgstr "Kiterjesztés"
+
+#. Resource IDs: (60008, 60026, 60182, 60202)
+msgid "F"
+msgstr "F"
+
+#. Resource IDs: (235)
+msgid "F&iles (e.g.: *.txt;*.dat):"
+msgstr "Fájlok (pl.: *.txt;*.dat):"
+
+#. Resource IDs: (236)
+msgid "F&older to search:"
+msgstr "Keresendő mappa:"
+
+#. Resource IDs: (60187, 60504)
+msgid "FN"
+msgstr "FN"
+
+#. Resource IDs: (60192)
+msgid "FP"
+msgstr "FP"
+
+#. Resource IDs: (60077)
+msgid "FR"
+msgstr "FR"
+
+#. Resource IDs: (60197)
+msgid "FSN"
+msgstr "FSN"
+
+#. Resource IDs: (60131)
+msgid "FT"
+msgstr "FT"
+
+#. Resource IDs: (139)
+msgid "Failed to download the list of available languages."
+msgstr "Az elérhető nyelvek listájának letöltése sikertelen."
+
+#. Resource IDs: (169)
+#, c-format
+msgid "Failed to load the file '%s'.\r\n\r\nThe error message is:\r\n%s"
+msgstr "A(z) '%s' fájl betöltése sikertelen.\r\n\r\nA hibaüzenet:\r\n%s"
+
+#. Resource IDs: (186)
+#, c-format
+msgid "Failed to save the file '%s'.\r\n\r\nThe error message is:\r\n%s"
+msgstr "A(z) '%s' fájl mentése sikertelen.\r\n\r\nA hibaüzenet:\r\n%s"
+
+#. Resource IDs: (137)
+msgid "Fetch remote languages..."
+msgstr "Távoli nyelvek letöltése..."
+
+#. Resource IDs: (247)
+msgid "Fetching plugins list - please wait..."
+msgstr "Bővítménylista letöltése - kérem várjon..."
+
+#. Resource IDs: (152, 60007)
+msgid "File"
+msgstr "Fájl"
+
+#. Resource IDs: (60130)
+msgid "File Tree"
+msgstr "Fájlfa"
+
+#. Resource IDs: (246)
+#, c-format
+msgid "File \"%s\" already exists."
+msgstr "A(z) \"%s\" fájl már létezik."
+
+#. Resource IDs: (161)
+msgid "File does not exist"
+msgstr "A fájl nem létezik"
+
+#. Resource IDs: (255)
+msgid "File extensions for this style, separated by semicolon.\nExample: cpp;c;h;hpp"
+msgstr "A stílushoz tartozó fájlkiterjesztések, pontosvesszővel elválasztva.\nPélda: cpp;c;h;hpp"
+
+#. Resource IDs: (104)
+msgid "File is too big to be opened by BowPad"
+msgstr "A fájl túl nagy a BowPad általi megnyitáshoz"
+
+#. Resource IDs: (279)
+msgid "File tree is empty\r\nno files to show"
+msgstr "A fájlfa üres\r\nnincsenek megjeleníthető fájlok"
+
+#. Resource IDs: (239)
+msgid "Filename required for first file."
+msgstr "Fájlnév szükséges az első fájlhoz."
+
+#. Resource IDs: (240)
+msgid "Filename required for second file."
+msgstr "Fájlnév szükséges a második fájlhoz."
+
+#. Resource IDs: (241)
+msgid "Filenames must be different."
+msgstr "A fájlneveknek különbözőnek kell lenniük."
+
+#. Resource IDs: (245)
+#, c-format
+msgid "Files \"%s\" and \"%s\" already exist."
+msgstr "A(z) \"%s\" és \"%s\" fájlok már léteznek."
+
+#. Resource IDs: (60167)
+msgid "Find"
+msgstr "Keresés"
+
+#. Resource IDs: (60183)
+msgid "Find && Replace"
+msgstr "Keresés és csere"
+
+#. Resource IDs: (158)
+msgid "Find &All"
+msgstr "Összes &keresése"
+
+#. Resource IDs: (210)
+msgid "Find All In &Folder"
+msgstr "Összes keresése a &mappában"
+
+#. Resource IDs: (159)
+msgid "Find All In All &Tabs"
+msgstr "Összes keresése minden &lapban"
+
+#. Resource IDs: (1073)
+msgid "Find Fi&les"
+msgstr "Fájlok &keresése"
+
+#. Resource IDs: (225)
+msgid "Find Files"
+msgstr "Fájlok keresése"
+
+#. Resource IDs: (60186, 60188)
+msgid "Find Next"
+msgstr "Következő keresése"
+
+#. Resource IDs: (60196, 60198)
+msgid "Find Next Selected"
+msgstr "Következő kijelölt keresése"
+
+#. Resource IDs: (60191, 60193)
+msgid "Find Previous"
+msgstr "Előző keresése"
+
+#. Resource IDs: (1016)
+msgid "Find Result Action"
+msgstr "Keresési eredmény művelet"
+
+#. Resource IDs: (233)
+msgid "Find and Replace for functions is not implemented."
+msgstr "A funkciók keresése és cseréje nincs implementálva."
+
+#. Resource IDs: (143)
+msgid "Find and replace"
+msgstr "Keresés és csere"
+
+#. Resource IDs: (231)
+msgid "Find previous."
+msgstr "Előző keresése."
+
+#. Resource IDs: (60179, 60181)
+msgid "Find/Replace"
+msgstr "Keresés/Csere"
+
+#. Resource IDs: (242)
+#, c-format
+msgid "Folder \"%s\" does not exist."
+msgstr "A(z) \"%s\" mappa nem létezik."
+
+#. Resource IDs: (243)
+msgid "Folder required for first file."
+msgstr "Mappa szükséges az első fájlhoz."
+
+#. Resource IDs: (244)
+msgid "Folder required for second file."
+msgstr "Mappa szükséges a második fájlhoz."
+
+#. Resource IDs: (60573)
+msgid "Folding"
+msgstr "Összecsukás"
+
+#. Resource IDs: (60581, 60582)
+msgid "Folding Off"
+msgstr "Összecsukás ki"
+
+#. Resource IDs: (60578, 60579)
+msgid "Folding On"
+msgstr "Összecsukás be"
+
+#. Resource IDs: (1015)
+msgid "Follow Tab"
+msgstr "Lap követése"
+
+#. Resource IDs: (60537, 65535)
+msgid "Font"
+msgstr "Betűtípus"
+
+#. Resource IDs: (199)
+#, c-format
+msgid "Found: %d matches in %d tabs."
+msgstr "Találat: %d egyezés %d lapban."
+
+#. Resource IDs: (198)
+#, c-format
+msgid "Found: %d matches."
+msgstr "Találat: %d egyezés."
+
+#. Resource IDs: (274)
+msgid "Frame for current line"
+msgstr "Keret az aktuális sorhoz"
+
+#. Resource IDs: (203)
+#, c-format
+msgid "Full file path:\r\n%s\r\n\r\nWord count: %ld\r\nLines: %ld\r\nEmpty lines: %ld\r\nParagraphs: %ld\r\n"
+msgstr "Teljes fájl elérési út:\r\n%s\r\n\r\nSzavak száma: %ld\r\nSorok: %ld\r\nÜres sorok: %ld\r\nBekezdések: %ld\r\n"
+
+#. Resource IDs: (1010, 60503, 60505)
+msgid "Functions"
+msgstr "Függvények"
+
+#. Resource IDs: (60324)
+msgid "GL"
+msgstr "GL"
+
+#. Resource IDs: (60329)
+msgid "GS"
+msgstr "GS"
+
+#. Resource IDs: (60204)
+msgid "Get captures of a regular expression from the current tab"
+msgstr "Reguláris kifejezés rögzítéseinek lekérése az aktuális lapból"
+
+#. Resource IDs: (145, 60323, 60325)
+msgid "Go to line"
+msgstr "Ugrás sorra"
+
+#. Resource IDs: (60328, 60330)
+msgid "Go to symbol"
+msgstr "Ugrás szimbólumra"
+
+#. Resource IDs: (60359)
+msgid "Goto"
+msgstr "Ugrás"
+
+#. Resource IDs: (60025, 60097)
+msgid "H"
+msgstr "H"
+
+#. Resource IDs: (272)
+msgid "Hardware acceleration"
+msgstr "Hardveres gyorsítás"
+
+#. Resource IDs: (1113)
+msgid "Highlight all matches"
+msgstr "Összes találat kiemelése"
+
+#. Resource IDs: (276)
+msgid "Highlight matching braces"
+msgstr "Egyező zárójelek kiemelése"
+
+#. Resource IDs: (277)
+msgid "If enabled matching braces are highlighted, and non-matching ones marked red."
+msgstr "Ha engedélyezve van, az egyező zárójelek ki vannak emelve, a nem egyezők pirossal vannak jelölve."
+
+#. Resource IDs: (271)
+msgid "If set to true, the scrollbar acts as a document bar. Set to false to get a normal scrollbar."
+msgstr "Ha igazra van állítva, a görgetősáv dokumentumsávként működik. Állítsa hamisra normál görgetősávhoz."
+
+#. Resource IDs: (214)
+msgid "Ignore"
+msgstr "Mellőzés"
+
+#. Resource IDs: (1079)
+msgid "Ignore &case."
+msgstr "&Kis- és nagybetűk különbségének mellőzése."
+
+#. Resource IDs: (216)
+msgid "Ignore word for this session"
+msgstr "Szó mellőzése ebben a munkamenetben"
+
+#. Resource IDs: (262)
+msgid "Import\nThe lexer file is imported. Restart BowPad to use the new lexer."
+msgstr "Importálás\nA lexer fájl importálva. Indítsa újra a BowPad-et az új lexer használatához."
+
+#. Resource IDs: (60635, 60636)
+msgid "Include uppercase"
+msgstr "Nagybetűk beleértve"
+
+#. Resource IDs: (60637)
+msgid "Include words that are all CAPS or have uppercase letters in the middle"
+msgstr "Tartalmazza a csak nagybetűket tartalmazó szavakat vagy a közepükben nagybetűt tartalmazó szavakat"
+
+#. Resource IDs: (60575, 60576, 60577)
+msgid "Init Folding Margin"
+msgstr "Összecsukási margó inicializálása"
+
+#. Resource IDs: (181)
+msgid "Insert"
+msgstr "Beszúrás"
+
+#. Resource IDs: (206)
+msgid "Insert Tabs or Spaces"
+msgstr "Tabulátorok vagy szóközök beszúrása"
+
+#. Resource IDs: (60094)
+msgid "Inserts the content of the clipboard at the cursor position"
+msgstr "A vágólap tartalmát beszúrja a kurzor pozíciójába"
+
+#. Resource IDs: (60099)
+msgid "Inserts the html content of the clipboard at the cursor position"
+msgstr "A vágólap HTML tartalmát beszúrja a kurzor pozíciójába"
+
+#. Resource IDs: (193)
+#, c-format
+msgid "Installation of plugin \"%s\" failed!"
+msgstr "A(z) \"%s\" bővítmény telepítése sikertelen!"
+
+#. Resource IDs: (191)
+msgid "Installed Version"
+msgstr "Telepített verzió"
+
+#. Resource IDs: (1021)
+msgid "Italic"
+msgstr "Dőlt"
+
+#. Resource IDs: (60275)
+msgid "JL"
+msgstr "JL"
+
+#. Resource IDs: (60274, 60276)
+msgid "Join Lines"
+msgstr "Sorok összefűzése"
+
+#. Resource IDs: (60277)
+msgid "Join selected lines to one long line"
+msgstr "A kijelölt sorokat egyetlen hosszú sorba fűzi"
+
+#. Resource IDs: (125)
+msgid "Keep the document\nThe document is kept open."
+msgstr "A dokumentum megtartása\nA dokumentum nyitva marad."
+
+#. Resource IDs: (60139)
+msgid "LA"
+msgstr "LA"
+
+#. Resource IDs: (60286)
+msgid "LD"
+msgstr "LD"
+
+#. Resource IDs: (60151)
+msgid "LEX"
+msgstr "LEX"
+
+#. Resource IDs: (60162)
+msgid "LF"
+msgstr "LF"
+
+#. Resource IDs: (60662)
+msgid "LR"
+msgstr "LR"
+
+#. Resource IDs: (60269, 60405, 60489)
+msgid "LS"
+msgstr "LS"
+
+#. Resource IDs: (60281)
+msgid "LU"
+msgstr "LU"
+
+#. Resource IDs: (60404, 60623)
+msgid "Language"
+msgstr "Nyelv"
+
+#. Resource IDs: (60152)
+msgid "Language Lexer"
+msgstr "Nyelvi lexer"
+
+#. Resource IDs: (138)
+msgid "Language selected.\nYou need to restart BowPad for the changes to take effect."
+msgstr "Nyelv kiválasztva.\nA BowPad újraindítása szükséges a változások érvényre juttatásához."
+
+#. Resource IDs: (1132, 65535)
+msgid "Language:"
+msgstr "Nyelv:"
+
+#. Resource IDs: (60426)
+msgid "Launch in Chrome"
+msgstr "Indítás Chrome-ban"
+
+#. Resource IDs: (60414, 60415)
+msgid "Launch in Edge"
+msgstr "Indítás Edge-ben"
+
+#. Resource IDs: (60422, 60423)
+msgid "Launch in Firefox"
+msgstr "Indítás Firefox-ban"
+
+#. Resource IDs: (60427)
+msgid "Launch in Google Chrome"
+msgstr "Indítás Google Chrome-ban"
+
+#. Resource IDs: (60418)
+msgid "Launch in IE"
+msgstr "Indítás IE-ben"
+
+#. Resource IDs: (60419)
+msgid "Launch in Internet Explorer"
+msgstr "Indítás Internet Explorer-ben"
+
+#. Resource IDs: (60434, 60435)
+msgid "Launch in Opera"
+msgstr "Indítás Opera-ban"
+
+#. Resource IDs: (60430, 60431)
+msgid "Launch in Safari"
+msgstr "Indítás Safari-ben"
+
+#. Resource IDs: (176)
+#, c-format
+msgid "Length in bytes: %ld (%s)\r\nLines: %s"
+msgstr "Hossz bájtokban: %ld (%s)\r\nSorok: %s"
+
+#. Resource IDs: (60150)
+msgid "Lexer"
+msgstr "Lexer"
+
+#. Resource IDs: (60392)
+msgid "Light"
+msgstr "Világos"
+
+#. Resource IDs: (60394)
+msgid "Light Theme"
+msgstr "Világos téma"
+
+#. Resource IDs: (238)
+#, c-format
+msgid "Limit reached of %d matches found!"
+msgstr "%d találat megtalálásának korlátja elérve!"
+
+#. Resource IDs: (153)
+msgid "Line"
+msgstr "Sor"
+
+#. Resource IDs: (177)
+#, c-format
+msgid "Line : %s\r\nColumn : %s\r\nSelection : %s | %s\r\nMatches: %s"
+msgstr "Sor : %s\r\nOszlop : %s\r\nKijelölés : %s | %s\r\nTalálatok: %s"
+
+#. Resource IDs: (60155)
+msgid "Line Endings"
+msgstr "Sorvégek"
+
+#. Resource IDs: (154)
+msgid "Line Text"
+msgstr "Sor szövege"
+
+#. Resource IDs: (178)
+#, c-format
+msgid "Line endings: %s"
+msgstr "Sorvégek: %s"
+
+#. Resource IDs: (60261)
+msgid "Line handling"
+msgstr "Sor kezelése"
+
+#. Resource IDs: (60125)
+msgid "Line numbers"
+msgstr "Sorszámok"
+
+#. Resource IDs: (65535)
+msgid "Line:"
+msgstr "Sor:"
+
+#. Resource IDs: (250)
+#, c-format
+msgid "Line: %%c%06X%s%%r / %%c%06X%s%%r   Column: %%c%06X%s%%r"
+msgstr "Sor: %%c%06X%s%%r / %%c%06X%s%%r   Oszlop: %%c%06X%s%%r"
+
+#. Resource IDs: (249)
+#, c-format
+msgid "Ln: %%c%06X%s%%r / %%c%06X%s%%r    Col: %%c%06X%s%%r"
+msgstr "Sor: %%c%06X%s%%r / %%c%06X%s%%r    Oszlop: %%c%06X%s%%r"
+
+#. Resource IDs: (60138, 60140)
+msgid "Load as"
+msgstr "Betöltés mint"
+
+#. Resource IDs: (60490)
+msgid "Load last session"
+msgstr "Utolsó munkamenet betöltése"
+
+#. Resource IDs: (60495)
+msgid "Load last session on start"
+msgstr "Utolsó munkamenet betöltése indításkor"
+
+#. Resource IDs: (60488)
+msgid "Load session"
+msgstr "Munkamenet betöltése"
+
+#. Resource IDs: (60493)
+msgid "Load session on start"
+msgstr "Munkamenet betöltése indításkor"
+
+#. Resource IDs: (236)
+msgid "Loading files..."
+msgstr "Fájlok betöltése..."
+
+#. Resource IDs: (235)
+msgid "Loading session..."
+msgstr "Munkamenet betöltése..."
+
+#. Resource IDs: (60496)
+msgid "Loads all files automatically that were open the last time BowPad got closed"
+msgstr "Automatikusan betölti az összes fájlt, amelyek nyitva voltak, amikor a BowPad utoljára bezárásra került"
+
+#. Resource IDs: (60491)
+msgid "Loads all files that were open the last time BowPad got closed"
+msgstr "Betölti az összes fájlt, amelyek nyitva voltak, amikor a BowPad utoljára bezárásra került"
+
+#. Resource IDs: (60241, 60243)
+msgid "Lowercase"
+msgstr "Kisbetűs"
+
+#. Resource IDs: (60002, 60028)
+msgid "M"
+msgstr "M"
+
+#. Resource IDs: (60165)
+msgid "MAC"
+msgstr "MAC"
+
+#. Resource IDs: (60164)
+msgid "MAC (CR)"
+msgstr "MAC (CR)"
+
+#. Resource IDs: (60242, 60247)
+msgid "ML"
+msgstr "ML"
+
+#. Resource IDs: (60027)
+msgid "MRU List"
+msgstr "Legutóbbi lista"
+
+#. Resource IDs: (60237)
+msgid "MU"
+msgstr "MU"
+
+#. Resource IDs: (1097)
+msgid "Mac (CR)"
+msgstr "Mac (CR)"
+
+#. Resource IDs: (60001)
+msgid "Main"
+msgstr "Fő"
+
+#. Resource IDs: (112)
+msgid "Main Encodings"
+msgstr "Fő kódolások"
+
+#. Resource IDs: (1008)
+msgid "Match &case"
+msgstr "Kis- és nagybetűk &egyeztetése"
+
+#. Resource IDs: (60385)
+msgid "Misc"
+msgstr "Egyéb"
+
+#. Resource IDs: (60285)
+msgid "Move down"
+msgstr "Mozgatás lefelé"
+
+#. Resource IDs: (60287)
+msgid "Move line down"
+msgstr "Sor mozgatása lefelé"
+
+#. Resource IDs: (60282)
+msgid "Move line up"
+msgstr "Sor mozgatása felfelé"
+
+#. Resource IDs: (60378)
+msgid "Move the caret to the next bookmark"
+msgstr "A kurzor mozgatása a következő könyvjelzőhöz"
+
+#. Resource IDs: (60383)
+msgid "Move the caret to the previous bookmark"
+msgstr "A kurzor mozgatása az előző könyvjelzőhöz"
+
+#. Resource IDs: (222)
+msgid "Move the file\nThe file tab is updated to the new path."
+msgstr "A fájl mozgatása\nA fájl lapja frissül az új útvonalra."
+
+#. Resource IDs: (60280)
+msgid "Move up"
+msgstr "Mozgatás felfelé"
+
+#. Resource IDs: (218)
+msgid "Move/Copy File"
+msgstr "Fájl mozgatása/másolása"
+
+#. Resource IDs: (60326)
+msgid "Moves the cursor to the specified line"
+msgstr "A kurzort a megadott sorra mozgatja"
+
+#. Resource IDs: (60331)
+msgid "Moves the cursor to the specified symbol"
+msgstr "A kurzort a megadott szimbólumra mozgatja"
+
+#. Resource IDs: (60288)
+msgid "Moves the selected lines downwards"
+msgstr "A kijelölt sorokat lefelé mozgatja"
+
+#. Resource IDs: (60283)
+msgid "Moves the selected lines upwards"
+msgstr "A kijelölt sorokat felfelé mozgatja"
+
+#. Resource IDs: (60189)
+msgid "Moves to the next match of the last search"
+msgstr "Ugrás az utolsó keresés következő találatához"
+
+#. Resource IDs: (60194)
+msgid "Moves to the previous match of the last search"
+msgstr "Ugrás az utolsó keresés előző találatához"
+
+#. Resource IDs: (60297, 60659)
+msgid "Multi-Edit"
+msgstr "Többszörös szerkesztés"
+
+#. Resource IDs: (281)
+#, c-format
+msgid "Multiedit: %%c%06X%s %%rmarkers"
+msgstr "Többszörös szerkesztés: %%c%06X%s %%rmarkerek"
+
+#. Resource IDs: (60033)
+msgid "N"
+msgstr "N"
+
+#. Resource IDs: (60175)
+msgid "NEXT"
+msgstr "KÖVETKEZŐ"
+
+#. Resource IDs: (105)
+#, c-format
+msgid "New %d"
+msgstr "Új %d"
+
+#. Resource IDs: (60551, 60552)
+msgid "New Copy"
+msgstr "Új másolat"
+
+#. Resource IDs: (237)
+msgid "New Corresponding Files."
+msgstr "Új megfelelő fájlok."
+
+#. Resource IDs: (60034)
+msgid "New Document"
+msgstr "Új dokumentum"
+
+#. Resource IDs: (60174, 60176, 60375)
+msgid "Next"
+msgstr "Következő"
+
+#. Resource IDs: (60377)
+msgid "Next Bookmark"
+msgstr "Következő könyvjelző"
+
+#. Resource IDs: (215)
+msgid "No corrections found!"
+msgstr "Nincsenek javítások!"
+
+#. Resource IDs: (197)
+msgid "No files found."
+msgstr "Nincsenek fájlok."
+
+#. Resource IDs: (151)
+msgid "No functions found!"
+msgstr "Nincsenek függvények!"
+
+#. Resource IDs: (234)
+msgid "No more occurrences to replace."
+msgstr "Nincs több cserélendő előfordulás."
+
+#. Resource IDs: (248)
+msgid "No plugins found. Check your internet connection."
+msgstr "Nincsenek bővítmények. Ellenőrizze az internetkapcsolatát."
+
+#. Resource IDs: (188)
+msgid "No plugins loaded"
+msgstr "Nincsenek betöltött bővítmények"
+
+#. Resource IDs: (226)
+msgid "No search folder."
+msgstr "Nincs keresési mappa."
+
+#. Resource IDs: (134)
+msgid "No updates available.\nYou already have the current version."
+msgstr "Nincs elérhető frissítés.\nMár rendelkezik a legújabb verzióval."
+
+#. Resource IDs: (60043)
+msgid "O"
+msgstr "O"
+
+#. Resource IDs: (1)
+msgid "OK"
+msgstr "OK"
+
+#. Resource IDs: (136)
+msgid "Online Languages"
+msgstr "Online nyelvek"
+
+#. Resource IDs: (60631, 60632)
+msgid "Only comments"
+msgstr "Csak megjegyzések"
+
+#. Resource IDs: (60442, 60443)
+msgid "Open Console"
+msgstr "Konzol megnyitása"
+
+#. Resource IDs: (60438, 60439, 60525, 60526)
+msgid "Open Explorer"
+msgstr "Intéző megnyitása"
+
+#. Resource IDs: (60543)
+msgid "Open File"
+msgstr "Fájl megnyitása"
+
+#. Resource IDs: (60544)
+msgid "Open File under cursor"
+msgstr "Kurzor alatti fájl megnyitása"
+
+#. Resource IDs: (60044)
+msgid "Open Files"
+msgstr "Fájlok megnyitása"
+
+#. Resource IDs: (60677)
+msgid "Open corresponding File"
+msgstr "Megfelelő fájl megnyitása"
+
+#. Resource IDs: (147)
+msgid "Open elevated\nBowPad is started again with elevated privileges."
+msgstr "Emelt szintű megnyitás\nA BowPad újraindul emelt jogosultságokkal."
+
+#. Resource IDs: (182)
+#, c-format
+msgid "Open files: %d"
+msgstr "Nyitott fájlok: %d"
+
+#. Resource IDs: (252)
+#, c-format
+msgid "Open tabs: %%c%06X%ld%%r"
+msgstr "Nyitott lapok: %%c%06X%ld%%r"
+
+#. Resource IDs: (253)
+#, c-format
+msgid "Open: %%c%06X%ld%%r"
+msgstr "Nyitva: %%c%06X%ld%%r"
+
+#. Resource IDs: (263)
+msgid "Open\nThe lexer file is opened in BowPad, ready for editing."
+msgstr "Megnyitás\nA lexer fájl megnyílik a BowPad-ben, szerkesztésre kész."
+
+#. Resource IDs: (60045)
+msgid "Opens one or more files"
+msgstr "Egy vagy több fájlt nyit meg"
+
+#. Resource IDs: (60444)
+msgid "Opens the Console at the current file location"
+msgstr "Megnyitja a Konzolt az aktuális fájl helyén"
+
+#. Resource IDs: (60440)
+msgid "Opens the Windows Explorer at the current file location"
+msgstr "Megnyitja a Windows Intézőt az aktuális fájl helyén"
+
+#. Resource IDs: (60527)
+msgid "Opens the Windows Explorer at the current file path"
+msgstr "Megnyitja a Windows Intézőt az aktuális fájl útvonalán"
+
+#. Resource IDs: (60535)
+msgid "Opens the config file to configure keyboard shortcuts for any command in BowPad"
+msgstr "Megnyitja a konfigurációs fájlt a BowPad bármely parancsához tartozó gyorsbillentyűk konfigurálásához"
+
+#. Resource IDs: (60678)
+msgid "Opens the corresponding file to the file in the current tab.\n(h/cpp, aspx/cs/vb)"
+msgstr "Megnyitja a megfelelő fájlt az aktuális lapban lévő fájlhoz.\n(h/cpp, aspx/cs/vb)"
+
+#. Resource IDs: (60416)
+msgid "Opens the current file in Microsoft Edge browser"
+msgstr "Megnyitja az aktuális fájlt a Microsoft Edge böngészőben"
+
+#. Resource IDs: (60420)
+msgid "Opens the current file in Microsoft Internet Explorer"
+msgstr "Megnyitja az aktuális fájlt a Microsoft Internet Explorer böngészőben"
+
+#. Resource IDs: (60424)
+msgid "Opens the current file in the Firefox browser"
+msgstr "Megnyitja az aktuális fájlt a Firefox böngészőben"
+
+#. Resource IDs: (60428)
+msgid "Opens the current file in the Google Chrome browser"
+msgstr "Megnyitja az aktuális fájlt a Google Chrome böngészőben"
+
+#. Resource IDs: (60436)
+msgid "Opens the current file in the Opera browser"
+msgstr "Megnyitja az aktuális fájlt az Opera böngészőben"
+
+#. Resource IDs: (60432)
+msgid "Opens the current file in the Safari browser"
+msgstr "Megnyitja az aktuális fájlt a Safari böngészőben"
+
+#. Resource IDs: (60452)
+msgid "Opens the default browser to search Wikipedia for the selected text"
+msgstr "Megnyitja az alapértelmezett böngészőt a Wikipédia kereséséhez a kijelölt szöveggel"
+
+#. Resource IDs: (60448)
+msgid "Opens the default browser to search for the selected text"
+msgstr "Megnyitja az alapértelmezett böngészőt a kijelölt szöveg kereséséhez"
+
+#. Resource IDs: (60545)
+msgid "Opens the file/path that's at the cursor position"
+msgstr "Megnyitja a kurzor pozíciójában lévő fájlt/útvonalat"
+
+#. Resource IDs: (60316)
+msgid "Opens the printer setup dialog"
+msgstr "Megnyitja a nyomtató beállító párbeszédablakot"
+
+#. Resource IDs: (60003)
+msgid "Other"
+msgstr "Egyéb"
+
+#. Resource IDs: (60333)
+msgid "Other operations"
+msgstr "Egyéb műveletek"
+
+#. Resource IDs: (180)
+msgid "Overtype"
+msgstr "Felülírás"
+
+#. Resource IDs: (60301, 60304, 60307)
+msgid "P"
+msgstr "P"
+
+#. Resource IDs: (60314)
+msgid "PP"
+msgstr "PP"
+
+#. Resource IDs: (60170)
+msgid "PREV"
+msgstr "ELŐZŐ"
+
+#. Resource IDs: (60319)
+msgid "PS"
+msgstr "PS"
+
+#. Resource IDs: (60318)
+msgid "Page Setup"
+msgstr "Oldalbeállítás"
+
+#. Resource IDs: (60091)
+msgid "Paste"
+msgstr "Beillesztés"
+
+#. Resource IDs: (60096)
+msgid "Paste Html"
+msgstr "HTML beillesztése"
+
+#. Resource IDs: (282)
+msgid "Path"
+msgstr "Útvonal"
+
+#. Resource IDs: (232)
+msgid "Please wait."
+msgstr "Kérem várjon."
+
+#. Resource IDs: (189)
+msgid "Plugin Name"
+msgstr "Bővítmény neve"
+
+#. Resource IDs: (60562)
+msgid "Plugin commands"
+msgstr "Bővítményparancsok"
+
+#. Resource IDs: (60555, 60561)
+msgid "Plugins"
+msgstr "Bővítmények"
+
+#. Resource IDs: (60079)
+msgid "Prevents editing the file"
+msgstr "Megakadályozza a fájl szerkesztését"
+
+#. Resource IDs: (60169, 60171, 60380)
+msgid "Previous"
+msgstr "Előző"
+
+#. Resource IDs: (60382)
+msgid "Previous Bookmark"
+msgstr "Előző könyvjelző"
+
+#. Resource IDs: (60300, 60303, 60306, 60309)
+msgid "Print"
+msgstr "Nyomtatás"
+
+#. Resource IDs: (60320)
+msgid "Print Page Setup"
+msgstr "Nyomtatási oldalbeállítás"
+
+#. Resource IDs: (60310)
+msgid "Print now"
+msgstr "Nyomtatás most"
+
+#. Resource IDs: (60313, 60315)
+msgid "Print setup"
+msgstr "Nyomtató beállítás"
+
+#. Resource IDs: (1082)
+msgid "R&eplace with:"
+msgstr "Csere erre:"
+
+#. Resource IDs: (60355)
+msgid "RELOAD"
+msgstr "ÚJRATÖLTÉS"
+
+#. Resource IDs: (256)
+msgid "Reading order (left-to-right or right-to-left)"
+msgstr "Olvasási sorrend (balról-jobbra vagy jobbról-balra)"
+
+#. Resource IDs: (60076)
+msgid "Readonly"
+msgstr "Csak olvasható"
+
+#. Resource IDs: (209)
+msgid "Recently Used Encodings"
+msgstr "Legutóbb használt kódolások"
+
+#. Resource IDs: (60107, 60109)
+msgid "Redo"
+msgstr "Újra"
+
+#. Resource IDs: (60110)
+msgid "Redo what was undone before"
+msgstr "Visszavonja a korábban visszavonást"
+
+#. Resource IDs: (157)
+msgid "Regex expression is invalid!"
+msgstr "A reguláris kifejezés érvénytelen!"
+
+#. Resource IDs: (156)
+msgid "Regex expression is valid"
+msgstr "A reguláris kifejezés érvényes"
+
+#. Resource IDs: (1009)
+msgid "Regex mode"
+msgstr "Reguláris kifejezés mód"
+
+#. Resource IDs: (60681, 60682)
+msgid "Register Win11 Context Menu"
+msgstr "Win11 helyi menü regisztrálása"
+
+#. Resource IDs: (60683)
+msgid "Registers BowPad in the Windows 11 context menu"
+msgstr "Regisztrálja a BowPad-et a Windows 11 helyi menüjében"
+
+#. Resource IDs: (60356)
+msgid "Reload"
+msgstr "Újratöltés"
+
+#. Resource IDs: (120)
+msgid "Reload document\nThe document is refreshed from disk."
+msgstr "Dokumentum újratöltése\nA dokumentum frissül a lemezről."
+
+#. Resource IDs: (121)
+msgid "Reload document\nThe unsaved modifications are lost."
+msgstr "Dokumentum újratöltése\nA nem mentett módosítások elvesznek."
+
+#. Resource IDs: (60357)
+msgid "Reload the file from disk"
+msgstr "A fájl újratöltése a lemezről"
+
+#. Resource IDs: (166)
+msgid "Reload\nThe unsaved modifications will be lost!"
+msgstr "Újratöltés\nA nem mentett módosítások elvesznek!"
+
+#. Resource IDs: (60664)
+msgid "Remove all empty lines or lines with only whitespace"
+msgstr "Az összes üres sor vagy csak szóközöket tartalmazó sor eltávolítása"
+
+#. Resource IDs: (60661, 60663)
+msgid "Remove empty lines"
+msgstr "Üres sorok eltávolítása"
+
+#. Resource IDs: (60373)
+msgid "Removes all bookmarks from the current file"
+msgstr "Eltávolítja az összes könyvjelzőt az aktuális fájlból"
+
+#. Resource IDs: (60341)
+msgid "Removes whitespaces at the end of lines"
+msgstr "Eltávolítja a szóközöket a sorok végéről"
+
+#. Resource IDs: (1004, 160)
+msgid "Replace &All"
+msgstr "Ö&sszes cseréje"
+
+#. Resource IDs: (168)
+msgid "Replace &all in selection"
+msgstr "Összes &cseréje a kijelölésben"
+
+#. Resource IDs: (175)
+msgid "Replace All In All &Tabs"
+msgstr "Összes cseréje minden &lapban"
+
+#. Resource IDs: (1136)
+msgid "Reset lexer style to default"
+msgstr "Lexer stílus visszaállítása alapértelmezettre"
+
+#. Resource IDs: (60217, 60219)
+msgid "Right margin"
+msgstr "Jobb margó"
+
+#. Resource IDs: (60411)
+msgid "Run"
+msgstr "Futtatás"
+
+#. Resource IDs: (257)
+msgid "Run as Administrator"
+msgstr "Futtatás rendszergazdaként"
+
+#. Resource IDs: (60412)
+msgid "Runs various commands"
+msgstr "Különféle parancsokat futtat"
+
+#. Resource IDs: (60048)
+msgid "S"
+msgstr "S"
+
+#. Resource IDs: (60210)
+msgid "SA"
+msgstr "SA"
+
+#. Resource IDs: (60494)
+msgid "SAL"
+msgstr "SAL"
+
+#. Resource IDs: (60499)
+msgid "SAS"
+msgstr "SAS"
+
+#. Resource IDs: (60291)
+msgid "SL"
+msgstr "SL"
+
+#. Resource IDs: (60213, 60350)
+msgid "ST"
+msgstr "ST"
+
+#. Resource IDs: (60061)
+msgid "Sa&ve as"
+msgstr "Mentés &másként"
+
+#. Resource IDs: (60052)
+msgid "Save &all"
+msgstr "Összes mentése"
+
+#. Resource IDs: (60049)
+msgid "Save File"
+msgstr "Fájl mentése"
+
+#. Resource IDs: (60054)
+msgid "Save Files"
+msgstr "Fájlok mentése"
+
+#. Resource IDs: (60063)
+msgid "Save as"
+msgstr "Mentés másként"
+
+#. Resource IDs: (149)
+msgid "Save elevated\nBowPad is started again with elevated privileges."
+msgstr "Emelt szintű mentés\nA BowPad újraindul emelt jogosultságokkal."
+
+#. Resource IDs: (119)
+msgid "Save modifications\nThe modifications that were made outside BowPad are overwritten."
+msgstr "Módosítások mentése\nA BowPad-en kívül végzett módosítások felülírásra kerülnek."
+
+#. Resource IDs: (60055)
+msgid "Saves all open files"
+msgstr "Menti az összes nyitott fájlt"
+
+#. Resource IDs: (60059)
+msgid "Saves changes automatically when the tab is switched or closed"
+msgstr "Automatikusan menti a változásokat, amikor a lapot váltják vagy bezárják"
+
+#. Resource IDs: (60050)
+msgid "Saves the current tab"
+msgstr "Menti az aktuális lapot"
+
+#. Resource IDs: (1100)
+msgid "Scintilla"
+msgstr "Scintilla"
+
+#. Resource IDs: (270)
+msgid "Scrollbar style"
+msgstr "Görgetősáv stílusa"
+
+#. Resource IDs: (60446, 60447)
+msgid "Search Web"
+msgstr "Webes keresés"
+
+#. Resource IDs: (60450, 60451)
+msgid "Search Wikipedia"
+msgstr "Wikipédia keresés"
+
+#. Resource IDs: (60184)
+msgid "Search and/or replace text in documents/tabs"
+msgstr "Szöveg keresése és/vagy cseréje dokumentumokban/lapokban"
+
+#. Resource IDs: (227)
+msgid "Search folder not found."
+msgstr "Keresési mappa nem található."
+
+#. Resource IDs: (144)
+msgid "Search text not found!"
+msgstr "Keresett szöveg nem található!"
+
+#. Resource IDs: (60199)
+msgid "Searches for the next match of the selected text"
+msgstr "A kijelölt szöveg következő egyezését keresi"
+
+#. Resource IDs: (211)
+#, c-format
+msgid "Searching in file '%s'"
+msgstr "Keresés a(z) '%s' fájlban"
+
+#. Resource IDs: (200)
+#, c-format
+msgid "Sel: %%c%06X%s%%r chars | %%c%06X%s%%r lines | %%c%06X%s%%r matches."
+msgstr "Kij: %%c%06X%s%%r karakter | %%c%06X%s%%r sor | %%c%06X%s%%r egyezés."
+
+#. Resource IDs: (60406)
+msgid "Select Language"
+msgstr "Nyelv kiválasztása"
+
+#. Resource IDs: (60209)
+msgid "Select all"
+msgstr "Összes kijelölése"
+
+#. Resource IDs: (60407)
+msgid "Select the language for BowPad"
+msgstr "Válassza ki a BowPad nyelvét"
+
+#. Resource IDs: (251)
+#, c-format
+msgid "Selection: %%c%06X%s%%r chars | %%c%06X%s%%r lines | %%c%06X%s%%r matches."
+msgstr "Kijelölés: %%c%06X%s%%r karakter | %%c%06X%s%%r sor | %%c%06X%s%%r egyezés."
+
+#. Resource IDs: (60390)
+msgid "Selects the UI theme"
+msgstr "Kiválasztja a felhasználói felület témáját"
+
+#. Resource IDs: (60403)
+msgid "Selects the UI theme according to the system setting"
+msgstr "Kiválasztja a felhasználói felület témáját a rendszer beállításának megfelelően"
+
+#. Resource IDs: (60399)
+msgid "Selects the dark UI theme"
+msgstr "Kiválasztja a sötét felhasználói felület témáját"
+
+#. Resource IDs: (60625)
+msgid "Selects the language for the spell checker"
+msgstr "Kiválasztja a helyesírás-ellenőrző nyelvét"
+
+#. Resource IDs: (60395)
+msgid "Selects the light UI theme"
+msgstr "Kiválasztja a világos felhasználói felület témáját"
+
+#. Resource IDs: (60311)
+msgid "Sends the document to the default printer"
+msgstr "A dokumentumot elküldi az alapértelmezett nyomtatónak"
+
+#. Resource IDs: (60037)
+msgid "Set Defaults"
+msgstr "Alapértelmezések beállítása"
+
+#. Resource IDs: (230)
+msgid "Set a new search folder."
+msgstr "Új keresési mappa beállítása."
+
+#. Resource IDs: (60038)
+msgid "Set default encoding and EOL"
+msgstr "Alapértelmezett kódolás és sorvég beállítása"
+
+#. Resource IDs: (228)
+msgid "Set search folder to its containing folder."
+msgstr "Keresési mappa beállítása a tartalmazó mappára."
+
+#. Resource IDs: (229)
+msgid "Set search folder to the current documents folder."
+msgstr "Keresési mappa beállítása az aktuális dokumentumok mappájára."
+
+#. Resource IDs: (60153)
+msgid "Set the coloring according to the code language"
+msgstr "A színezés beállítása a kód nyelvének megfelelően"
+
+#. Resource IDs: (60039)
+msgid "Set the default encoding (e.g. ANSI, UTF-8, ...) and end-of-line style for new files"
+msgstr "Az alapértelmezett kódolás (pl. ANSI, UTF-8, ...) és sorvégek stílusának beállítása új fájlokhoz"
+
+#. Resource IDs: (60254)
+msgid "Set the number of columns for one tabulator."
+msgstr "Az egy tabulátorhoz tartozó oszlopok számának beállítása."
+
+#. Resource IDs: (60321)
+msgid "Set up print margins, page size, page orientation"
+msgstr "Nyomtatási margók, oldalméret, oldaltájolás beállítása"
+
+#. Resource IDs: (60220)
+msgid "Sets the column at which the vertical edge is shown, indicating the right margin. Set to 0 to hide it."
+msgstr "Beállítja azt az oszlopot, ahol a függőleges él megjelenik, jelezve a jobb margót. Állítsa 0-ra a rejtéshez."
+
+#. Resource IDs: (266)
+msgid "Setting"
+msgstr "Beállítás"
+
+#. Resource IDs: (60529, 60530)
+msgid "Show Properties"
+msgstr "Tulajdonságok megjelenítése"
+
+#. Resource IDs: (60121)
+msgid "Show Whitespaces"
+msgstr "Szóközök megjelenítése"
+
+#. Resource IDs: (60680)
+msgid "Show clipboard history"
+msgstr "Vágólap előzmények megjelenítése"
+
+#. Resource IDs: (60127)
+msgid "Show line numbers"
+msgstr "Sorszámok megjelenítése"
+
+#. Resource IDs: (60132)
+msgid "Show the file tree"
+msgstr "Fájlfa megjelenítése"
+
+#. Resource IDs: (60486)
+msgid "Shows a dialog to configure custom commands"
+msgstr "Megjelenít egy párbeszédablakot az egyéni parancsok konfigurálásához"
+
+#. Resource IDs: (60559)
+msgid "Shows a dialog to configure the installed plugins and install new plugins"
+msgstr "Megjelenít egy párbeszédablakot a telepített bővítmények konfigurálásához és új bővítmények telepítéséhez"
+
+#. Resource IDs: (60506)
+msgid "Shows a list of functions/methods in the file to jump to"
+msgstr "Megjelenít egy listát a fájlban található függvényekről/metódusokról az ugráshoz"
+
+#. Resource IDs: (60133)
+msgid "Shows or hides the file tree"
+msgstr "Megjeleníti vagy elrejti a fálfát"
+
+#. Resource IDs: (60571)
+msgid "Shows statistics about the current document"
+msgstr "Statisztikákat jelenít meg az aktuális dokumentumról"
+
+#. Resource IDs: (60531)
+msgid "Shows the Windows Explorer file properties dialog for the current file"
+msgstr "Megjeleníti a Windows Intéző fájltulajdonságok párbeszédablakát az aktuális fájlhoz"
+
+#. Resource IDs: (60567)
+msgid "Shows the list of all opened tabs."
+msgstr "Megjeleníti az összes nyitott lap listáját."
+
+#. Resource IDs: (1130)
+msgid "Snippet Name/Key:"
+msgstr "Kódrészlet neve/kulcsa:"
+
+#. Resource IDs: (1134)
+msgid "Snippets"
+msgstr "Kódrészletek"
+
+#. Resource IDs: (60290, 60292)
+msgid "Sort Lines"
+msgstr "Sorok rendezése"
+
+#. Resource IDs: (203)
+msgid "Sort Lines - Options"
+msgstr "Sorok rendezése - Beállítások"
+
+#. Resource IDs: (60293)
+msgid "Sorts the current selection (normal or rectangular)."
+msgstr "Rendezi az aktuális kijelölést (normál vagy téglalap alakú)."
+
+#. Resource IDs: (60349, 60351)
+msgid "Spaces to Tabs"
+msgstr "Szóközök tabulátorokká"
+
+#. Resource IDs: (60617)
+msgid "Spell Check"
+msgstr "Helyesírás-ellenőrzés"
+
+#. Resource IDs: (60619, 60620, 60628)
+msgid "Spell checker"
+msgstr "Helyesírás-ellenőrző"
+
+#. Resource IDs: (60624)
+msgid "Spell checker language"
+msgstr "Helyesírás-ellenőrző nyelve"
+
+#. Resource IDs: (60268, 60270)
+msgid "Split Lines"
+msgstr "Sorok szétválasztása"
+
+#. Resource IDs: (60271)
+msgid "Split long lines at the right window border"
+msgstr "Hosszú sorok szétválasztása az ablak jobb szélénél"
+
+#. Resource IDs: (1088)
+msgid "Status"
+msgstr "Állapot"
+
+#. Resource IDs: (144)
+msgid "Style Configurator"
+msgstr "Stílus konfigurátor"
+
+#. Resource IDs: (60671)
+msgid "Style selection"
+msgstr "Stílus kiválasztása"
+
+#. Resource IDs: (65535)
+msgid "Style:"
+msgstr "Stílus:"
+
+#. Resource IDs: (65535)
+msgid "Styles"
+msgstr "Stílusok"
+
+#. Resource IDs: (1012)
+msgid "Sub Folders"
+msgstr "Almappák"
+
+#. Resource IDs: (156, 60569)
+msgid "Summary"
+msgstr "Összefoglaló"
+
+#. Resource IDs: (60400)
+msgid "System"
+msgstr "Rendszer"
+
+#. Resource IDs: (196)
+msgid "System Includes"
+msgstr "Rendszerfájlok"
+
+#. Resource IDs: (60402)
+msgid "System Theme"
+msgstr "Rendszer téma"
+
+#. Resource IDs: (60339)
+msgid "T"
+msgstr "T"
+
+#. Resource IDs: (60397)
+msgid "TD"
+msgstr "TD"
+
+#. Resource IDs: (60393)
+msgid "TL"
+msgstr "TL"
+
+#. Resource IDs: (60252, 60345, 60401)
+msgid "TS"
+msgstr "TS"
+
+#. Resource IDs: (60388)
+msgid "TT"
+msgstr "TT"
+
+#. Resource IDs: (60566)
+msgid "Tab List"
+msgstr "Lap lista"
+
+#. Resource IDs: (60251, 60253)
+msgid "Tab Size"
+msgstr "Tabulátor méret"
+
+#. Resource IDs: (60565)
+msgid "Tabs"
+msgstr "Lapok"
+
+#. Resource IDs: (60344, 60346)
+msgid "Tabs to Spaces"
+msgstr "Tabulátorok szóközökké"
+
+#. Resource IDs: (60672)
+msgid "Tail -f"
+msgstr "Tail -f"
+
+#. Resource IDs: (117)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad, but there are unsaved changes in the document."
+msgstr "A(z) '%s' dokumentum módosult a BowPad-en kívül, de vannak nem mentett módosítások a dokumentumban."
+
+#. Resource IDs: (118)
+#, c-format
+msgid "The document '%s' was modified outside of BowPad."
+msgstr "A(z) '%s' dokumentum módosult a BowPad-en kívül."
+
+#. Resource IDs: (124)
+#, c-format
+msgid "The document '%s' was removed outside of BowPad."
+msgstr "A(z) '%s' dokumentum eltávolításra került a BowPad-en kívül."
+
+#. Resource IDs: (162)
+#, c-format
+msgid "The file '%s' does not exist. Do you want to create it?"
+msgstr "A(z) '%s' fájl nem létezik. Létre szeretné hozni?"
+
+#. Resource IDs: (184)
+msgid "The file is marked as read only. Are you sure you want to edit this file?"
+msgstr "A fájl csak olvashatóként van megjelölve. Biztosan szerkeszteni szeretné ezt a fájlt?"
+
+#. Resource IDs: (183)
+msgid "The file is write protected"
+msgstr "A fájl írásvédett"
+
+#. Resource IDs: (60387, 60389)
+msgid "Theme"
+msgstr "Téma"
+
+#. Resource IDs: (60246, 60248)
+msgid "Titlecase"
+msgstr "Címként írt"
+
+#. Resource IDs: (60367)
+msgid "Toggle Bookmark"
+msgstr "Könyvjelző ki/be"
+
+#. Resource IDs: (60368)
+msgid "Toggle a bookmark on the current line"
+msgstr "Könyvjelzőt kapcsol ki/be az aktuális soron"
+
+#. Resource IDs: (60584, 60585)
+msgid "Toggle folding all"
+msgstr "Összes összecsukás ki/be"
+
+#. Resource IDs: (60587, 60588)
+msgid "Toggle level 0"
+msgstr "0. szint ki/be"
+
+#. Resource IDs: (60590, 60591)
+msgid "Toggle level 1"
+msgstr "1. szint ki/be"
+
+#. Resource IDs: (60593, 60594)
+msgid "Toggle level 2"
+msgstr "2. szint ki/be"
+
+#. Resource IDs: (60596, 60597)
+msgid "Toggle level 3"
+msgstr "3. szint ki/be"
+
+#. Resource IDs: (60599, 60600)
+msgid "Toggle level 4"
+msgstr "4. szint ki/be"
+
+#. Resource IDs: (60602, 60603)
+msgid "Toggle level 5"
+msgstr "5. szint ki/be"
+
+#. Resource IDs: (60605, 60606)
+msgid "Toggle level 6"
+msgstr "6. szint ki/be"
+
+#. Resource IDs: (60608, 60609)
+msgid "Toggle level 7"
+msgstr "7. szint ki/be"
+
+#. Resource IDs: (60611, 60612)
+msgid "Toggle level 8"
+msgstr "8. szint ki/be"
+
+#. Resource IDs: (60614, 60615)
+msgid "Toggle level 9"
+msgstr "9. szint ki/be"
+
+#. Resource IDs: (1078)
+msgid "Treat digits as &numbers."
+msgstr "Számjegyek kezelése &számként."
+
+#. Resource IDs: (60338, 60340)
+msgid "Trim Whitespaces"
+msgstr "Szóközök vágása"
+
+#. Resource IDs: (132)
+msgid "Turn off automatic update checks"
+msgstr "Automatikus frissítés ellenőrzés kikapcsolása"
+
+#. Resource IDs: (60128)
+msgid "Turns showing the line numbers on/off"
+msgstr "Bekapcsolja/kikapcsolja a sorszámok megjelenítését"
+
+#. Resource IDs: (60122)
+msgid "Turns showing whitespaces on/off.\nHold down the Shift key to show EOLs as well."
+msgstr "Bekapcsolja/kikapcsolja a szóközök megjelenítését.\nNyomja nyomva tartva a Shift billentyűt a sorvégek megjelenítéséhez is."
+
+#. Resource IDs: (179)
+#, c-format
+msgid "Typing mode: %s"
+msgstr "Gépelési mód: %s"
+
+#. Resource IDs: (60014)
+msgid "U"
+msgstr "U"
+
+#. Resource IDs: (60257)
+msgid "UT"
+msgstr "UT"
+
+#. Resource IDs: (1074)
+msgid "UTF-16 Big Endian"
+msgstr "UTF-16 Big Endian"
+
+#. Resource IDs: (1073)
+msgid "UTF-16 Little Endian"
+msgstr "UTF-16 Little Endian"
+
+#. Resource IDs: (1076)
+msgid "UTF-32 Big Endian"
+msgstr "UTF-32 Big Endian"
+
+#. Resource IDs: (1075)
+msgid "UTF-32 Little Endian"
+msgstr "UTF-32 Little Endian"
+
+#. Resource IDs: (1071)
+msgid "UTF-8"
+msgstr "UTF-8"
+
+#. Resource IDs: (1072)
+msgid "UTF-8 with BOM"
+msgstr "UTF-8 BOM-mal"
+
+#. Resource IDs: (60228, 60230)
+msgid "Uncomment"
+msgstr "Megjegyzés eltávolítása"
+
+#. Resource IDs: (60231)
+msgid "Uncomments the selected text"
+msgstr "Eltávolítja a megjegyzést a kijelölt szövegből"
+
+#. Resource IDs: (1009)
+msgid "Underline"
+msgstr "Aláhúzás"
+
+#. Resource IDs: (60013, 60101, 60103)
+msgid "Undo"
+msgstr "Visszavonás"
+
+#. Resource IDs: (60104)
+msgid "Undo the last change"
+msgstr "Visszavonja az utolsó változtatást"
+
+#. Resource IDs: (1096, 60161)
+msgid "Unix (LF)"
+msgstr "Unix (LF)"
+
+#. Resource IDs: (60684, 60685)
+msgid "Unregister Win11 Context Menu"
+msgstr "Win11 helyi menü regisztrációjának törlése"
+
+#. Resource IDs: (60686)
+msgid "Unregisters BowPad from the Windows 11 context menu"
+msgstr "Törli a BowPad regisztrációját a Windows 11 helyi menüjéből"
+
+#. Resource IDs: (111)
+msgid "Unsaved modifications"
+msgstr "Nem mentett módosítások"
+
+#. Resource IDs: (60236, 60238)
+msgid "Uppercase"
+msgstr "Nagybetűs"
+
+#. Resource IDs: (155)
+msgid "Use $0 for the whole match, and $1..$99 for group matches."
+msgstr "Használja $0-t az egész egyezéshez, és $1..$99-t a csoport egyezésekhez."
+
+#. Resource IDs: (60256, 60258)
+msgid "Use Tabs"
+msgstr "Tabulátorok használata"
+
+#. Resource IDs: (1133)
+msgid "Use ^nPlaceHolder^ to mark a placeholder token, use ^0^ to mark the insertion point at the end."
+msgstr "Használja a ^nHelytartó^ helytartó jelölésére, ^0^-t használja a beszúrási pont jelölésére a végén."
+
+#. Resource IDs: (195)
+msgid "User Includes"
+msgstr "Felhasználói fájlok"
+
+#. Resource IDs: (60004, 60017, 60092)
+msgid "V"
+msgstr "V"
+
+#. Resource IDs: (60020, 60218)
+msgid "VE"
+msgstr "VE"
+
+#. Resource IDs: (267)
+msgid "Value"
+msgstr "Érték"
+
+#. Resource IDs: (190)
+msgid "Version"
+msgstr "Verzió"
+
+#. Resource IDs: (60019)
+msgid "Vertical Edge"
+msgstr "Függőleges él"
+
+#. Resource IDs: (60016)
+msgid "View"
+msgstr "Nézet"
+
+#. Resource IDs: (1026)
+msgid "Visit our Website"
+msgstr "Látogassa meg weboldalunkat"
+
+#. Resource IDs: (60114, 60336)
+msgid "W"
+msgstr "W"
+
+#. Resource IDs: (60126)
+msgid "WL"
+msgstr "WL"
+
+#. Resource IDs: (60120, 60640)
+msgid "WS"
+msgstr "WS"
+
+#. Resource IDs: (1059)
+msgid "Web Search:"
+msgstr "Webes keresés:"
+
+#. Resource IDs: (261)
+#, c-format
+msgid "What do you want to do with the BowPad lexer file \"%s\"?"
+msgstr "Mit szeretne tenni a(z) \"%s\" BowPad lexer fájllal?"
+
+#. Resource IDs: (1094)
+msgid "When loading, prefer utf8 over ANSI/Local"
+msgstr "Betöltéskor előnyben részesítse az utf8-at az ANSI/Helyi helyett"
+
+#. Resource IDs: (60119)
+msgid "Whitespace"
+msgstr "Szóköz"
+
+#. Resource IDs: (60335)
+msgid "Whitespaces"
+msgstr "Szóközök"
+
+#. Resource IDs: (1095, 60158)
+msgid "Windows (CRLF)"
+msgstr "Windows (CRLF)"
+
+#. Resource IDs: (60113, 60115)
+msgid "Wrap Lines"
+msgstr "Sor tördelése"
+
+#. Resource IDs: (143)
+msgid "Wrap around."
+msgstr "Körbe."
+
+#. Resource IDs: (60116)
+msgid "Wrap lines at the end of the window"
+msgstr "Sorok tördelése az ablak végénél"
+
+#. Resource IDs: (60078)
+msgid "Write protected"
+msgstr "Írásvédett"
+
+#. Resource IDs: (60030, 60087)
+msgid "X"
+msgstr "X"
+
+#. Resource IDs: (60108)
+msgid "Y"
+msgstr "Y"
+
+#. Resource IDs: (142)
+msgid "You can use the following strings in the command line:\r\n$(LINE)\t\t\tThe line where the cursor is\r\n$(POS)\t\t\tthe position where the cursor is\r\n$(TAB_PATH)\t\tthe path to the file of the active tab\r\n$(TAB_NAME)\t\tthe file name without extension of the current tab\r\n$(TAB_EXT)\t\tthe file extension of the current tab\r\n$(TAB_DIR)\t\tthe directory of the file of the active tab\r\n$(SEL_TEXT)\t\tthe selected text or the word at the cursor position\r\n$(SEL_TEXT_ESCAPED)\tlike $(SEL_TEXT) but escaped, useful for urls"
+msgstr "A következő karakterláncokat használhatja a parancssorban:\r\n$(LINE)\t\t\tA sor, ahol a kurzor van\r\n$(POS)\t\t\ta pozíció, ahol a kurzor van\r\n$(TAB_PATH)\t\taz aktív lap fájljának elérési útja\r\n$(TAB_NAME)\t\taz aktuális lap fájlneve kiterjesztés nélkül\r\n$(TAB_EXT)\t\taz aktuális lap fájlkiterjesztése\r\n$(TAB_DIR)\t\taz aktív lap fájljának könyvtára\r\n$(SEL_TEXT)\t\ta kijelölt szöveg vagy a kurzor pozíciójában lévő szó\r\n$(SEL_TEXT_ESCAPED)\tmint $(SEL_TEXT), de escape-elt, hasznos URL-ekhez"
+
+#. Resource IDs: (192)
+msgid "You have to restart BowPad for the plugin changes to take effect."
+msgstr "Újra kell indítania a BowPad-et a bővítmény változások érvényre juttatásához."
+
+#. Resource IDs: (60102)
+msgid "Z"
+msgstr "Z"
+
+#. Resource IDs: (208)
+#, c-format
+msgid "Zoom: %%c%06X%d%%r%%"
+msgstr "Nagyítás: %%c%06X%d%%r%%"
+
+#. Resource IDs: (1071, 1090, 1091)
+msgid "^"
+msgstr "^"
+
+#. Resource IDs: (65535)
+msgid "background:"
+msgstr "háttér:"
+
+#. Resource IDs: (1102)
+msgid "capture expression:"
+msgstr "rögzítési kifejezés:"
+
+#. Resource IDs: (269)
+msgid "checks for new versions of BowPad once a week"
+msgstr "hetente egyszer ellenőrzi a BowPad új verzióit"
+
+#. Resource IDs: (278)
+msgid "click to copy to clipboard"
+msgstr "kattintson a vágólapra másoláshoz"
+
+#. Resource IDs: (60655, 60656)
+msgid "configure advanced settings"
+msgstr "speciális beállítások konfigurálása"
+
+#. Resource IDs: (60652)
+msgid "configure autocompletion words and code snippets"
+msgstr "automatikus kiegészítési szavak és kódrészletek konfigurálása"
+
+#. Resource IDs: (1105)
+msgid "dot matches newline"
+msgstr "pont új sorral is egyezik"
+
+#. Resource IDs: (60647)
+msgid "enable autocompletion"
+msgstr "automatikus kiegészítés engedélyezése"
+
+#. Resource IDs: (60648)
+msgid "enable/disable autocompletion when editing"
+msgstr "automatikus kiegészítés be/ki kapcsolása szerkesztéskor"
+
+#. Resource IDs: (65535)
+msgid "foreground:"
+msgstr "előtér:"
+
+#. Resource IDs: (115)
+#, c-format
+msgid "from %ld to %ld"
+msgstr "%ld -től %ld -ig"
+
+#. Resource IDs: (60177)
+msgid "go to the next cursor position"
+msgstr "ugrás a következő kurzorpozícióra"
+
+#. Resource IDs: (60172)
+msgid "go to the previous cursor position"
+msgstr "ugrás az előző kurzorpozícióra"
+
+#. Resource IDs: (1113)
+msgid "hide lexer from dropdown"
+msgstr "lexer elrejtése a legördülő menüből"
+
+#. Resource IDs: (60639, 60641)
+msgid "indent wrapped lines"
+msgstr "tördeltek sorok behúzása"
+
+#. Resource IDs: (60642)
+msgid "indents wrapped sublines"
+msgstr "behúzza a tördeltek alsorokat"
+
+#. Resource IDs: (60687)
+msgid "no plugins loaded"
+msgstr "nincsenek betöltött bővítmények"
+
+#. Resource IDs: (1101)
+msgid "regular expression:"
+msgstr "reguláris kifejezés:"
+
+#. Resource IDs: (60455)
+msgid "runs the custom command 0"
+msgstr "futtatja az egyéni parancs 0-t"
+
+#. Resource IDs: (60458)
+msgid "runs the custom command 1"
+msgstr "futtatja az egyéni parancs 1-et"
+
+#. Resource IDs: (60461)
+msgid "runs the custom command 2"
+msgstr "futtatja az egyéni parancs 2-t"
+
+#. Resource IDs: (60464)
+msgid "runs the custom command 3"
+msgstr "futtatja az egyéni parancs 3-at"
+
+#. Resource IDs: (60467)
+msgid "runs the custom command 4"
+msgstr "futtatja az egyéni parancs 4-et"
+
+#. Resource IDs: (60470)
+msgid "runs the custom command 5"
+msgstr "futtatja az egyéni parancs 5-öt"
+
+#. Resource IDs: (60473)
+msgid "runs the custom command 6"
+msgstr "futtatja az egyéni parancs 6-ot"
+
+#. Resource IDs: (60476)
+msgid "runs the custom command 7"
+msgstr "futtatja az egyéni parancs 7-et"
+
+#. Resource IDs: (60479)
+msgid "runs the custom command 8"
+msgstr "futtatja az egyéni parancs 8-at"
+
+#. Resource IDs: (60482)
+msgid "runs the custom command 9"
+msgstr "futtatja az egyéni parancs 9-et"
+
+#. Resource IDs: (60586)
+msgid "toggles folding all levels in the whole document"
+msgstr "összes szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60589)
+msgid "toggles folding at level 0 in the whole document"
+msgstr "0. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60592)
+msgid "toggles folding at level 1 in the whole document"
+msgstr "1. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60595)
+msgid "toggles folding at level 2 in the whole document"
+msgstr "2. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60598)
+msgid "toggles folding at level 3 in the whole document"
+msgstr "3. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60601)
+msgid "toggles folding at level 4 in the whole document"
+msgstr "4. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60604)
+msgid "toggles folding at level 5 in the whole document"
+msgstr "5. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60607)
+msgid "toggles folding at level 6 in the whole document"
+msgstr "6. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60610)
+msgid "toggles folding at level 7 in the whole document"
+msgstr "7. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60613)
+msgid "toggles folding at level 8 in the whole document"
+msgstr "8. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (60616)
+msgid "toggles folding at level 9 in the whole document"
+msgstr "9. szint összecsukásának ki/be kapcsolása a teljes dokumentumban"
+
+#. Resource IDs: (280)
+msgid "too many files to show ({0})"
+msgstr "túl sok fájl a megjelenítéshez ({0})"
+
+#. Resource IDs: (60580)
+msgid "turn on folding"
+msgstr "összecsukás bekapcsolása"
+
+#. Resource IDs: (60583)
+msgid "turns off folding"
+msgstr "összecsukás kikapcsolása"
+
+#. Resource IDs: (60666)
+msgid "with style 1"
+msgstr "1-es stílussal"
+
+#. Resource IDs: (60667)
+msgid "with style 2"
+msgstr "2-es stílussal"
+
+#. Resource IDs: (60668)
+msgid "with style 3"
+msgstr "3-as stílussal"
+
+#. Resource IDs: (60669)
+msgid "with style 4"
+msgstr "4-es stílussal"
+
+#. Resource IDs: (258)
+#, c-format
+msgid "{ %d lines }"
+msgstr "{ %d sor }"
