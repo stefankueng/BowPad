@@ -1,0 +1,171 @@
+// returns the version of the plugin
+function Version() { return 101; }
+
+function formatJson(str, indentStr) {
+    var indent = 0;
+    var result = "";
+    var inString = false;
+    var escape = false;
+    
+    str = str.replace(/^\s+|\s+$/g, "");
+    
+    for (var i = 0; i < str.length; i++) {
+        var c = str.charAt(i);
+        
+        if (escape) {
+            result += c;
+            escape = false;
+            continue;
+        }
+        
+        if (c === '\\') {
+            result += c;
+            escape = true;
+            continue;
+        }
+        
+        if (c === '"') {
+            inString = !inString;
+            result += c;
+            continue;
+        }
+        
+        if (inString) {
+            result += c;
+            continue;
+        }
+        
+        if (c === '{' || c === '[') {
+            result += c + "\r\n";
+            indent++;
+            for (var j = 0; j < indent; j++) {
+                result += indentStr;
+            }
+        } else if (c === '}' || c === ']') {
+            indent--;
+            result += "\r\n";
+            for (var j = 0; j < indent; j++) {
+                result += indentStr;
+            }
+            result += c;
+        } else if (c === ',') {
+            result += c + "\r\n";
+            for (var j = 0; j < indent; j++) {
+                result += indentStr;
+            }
+        } else if (c === ':') {
+            result += c + " ";
+        } else if (c === ' ' || c === '\t' || c === '\r' || c === '\n') {
+            // skip whitespace outside strings
+        } else {
+            result += c;
+        }
+    }
+    
+    return result;
+}
+
+function compactJson(str) {
+    var result = "";
+    var inString = false;
+    var escape = false;
+    
+    str = str.replace(/^\s+|\s+$/g, "");
+    
+    for (var i = 0; i < str.length; i++) {
+        var c = str.charAt(i);
+        
+        if (escape) {
+            result += c;
+            escape = false;
+            continue;
+        }
+        
+        if (c === '\\') {
+            result += c;
+            escape = true;
+            continue;
+        }
+        
+        if (c === '"') {
+            inString = !inString;
+            result += c;
+            continue;
+        }
+        
+        if (inString) {
+            result += c;
+            continue;
+        }
+        
+        if (c === ' ' || c === '\t' || c === '\r' || c === '\n') {
+            continue;
+        }
+        
+        result += c;
+    }
+    
+    return result;
+}
+
+function validateJson(str) {
+    str = str.replace(/^\s+|\s+$/g, "");
+    if (str.length === 0) return false;
+    var first = str.charAt(0);
+    return (first === '{' || first === '[');
+}
+
+// this is the main function that gets executed when the command is run
+function Execute()
+{
+    var s = BowPad.SciGetSelText();
+    var hasSelection = s.length > 0;
+    
+    if (!hasSelection) {
+        var l = BowPad.SciGetLength();
+        if (l > 1048576) {
+            BowPad.alert("Document too large. Please select JSON to format (max 1MB).");
+            return false;
+        }
+        s = BowPad.SciGetTextRange(0, l);
+        BowPad.SciSelectAll();
+    }
+    
+    if (s.length == 0) {
+        return false;
+    }
+    
+    if (!validateJson(s)) {
+        BowPad.alert("Invalid JSON: must start with { or [");
+        return false;
+    }
+    
+    var result;
+    var indentStr = "    ";
+    
+    if (BowPad.GetKeyState(0x11)) {
+        result = compactJson(s);
+    } else {
+        result = formatJson(s, indentStr);
+    }
+    
+    if (BowPad.GetKeyState(0x10)) {
+        BowPad.OpenNewTab();
+        BowPad.SciInsertText(0, result);
+        BowPad.SciEmptyUndoBuffer();
+        BowPad.SciSetSavePoint();
+    } else {
+        BowPad.SciReplaceSel(result);
+    }
+    return true;
+}
+
+// return true if the plugin command is enabled
+function IsEnabled() { return BowPad.HasActiveDocument; }
+
+// return true if the plugin button should appear as checked
+function IsChecked() { return false; }
+
+// called after a document was opened
+function OnDocumentOpen(index) {
+}

@@ -30,3 +30,7 @@ SearchSelection
 104
 200
 Search Selection: extracts all lines that contain the selected text.\r\nCtrl click: match whole word; Shift click: match case.\nStefan Küng, wmjordan\n
+JsonFormatter
+101
+200
+Format JSON (beautify/compact).\nClick: format with indentation; Ctrl click: compact; Shift click: show in new tab.\nJiangKlijna\n
