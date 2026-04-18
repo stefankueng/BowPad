@@ -1,0 +1,42 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="Win32" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Build/">
+    <File Path="default.build" />
+    <File Path="default.build.user" />
+    <File Path="default.build.user.tmpl" />
+    <File Path="version.build.in" />
+    <File Path="versioninfo.build" />
+  </Folder>
+  <Folder Name="/Setup/">
+    <File Path="src/Setup/AppXManifest.xml.in" />
+    <File Path="src/Setup/setup.build" />
+    <File Path="src/Setup/Setup.wxs" />
+    <File Path="src/Setup/VersionNumberInclude.in.wxi" />
+    <Project Path="src/Setup/CustomActions/CustomActions.vcxproj" Id="454d5fcc-e25a-4b45-9ca2-01abb0fa5181">
+      <BuildType Project="Release" />
+    </Project>
+  </Folder>
+  <Project Path="ext/compact_enc_det.vcxproj" Id="76f5b9bf-002b-4244-b3f6-cc5ae0d0b35f" />
+  <Project Path="ext/coolsb/coolsb.vcxproj" Id="22b28d94-8fb7-484f-ad33-b3f2bd25351f">
+    <BuildType Solution="Debug|ARM64" Project="Release" />
+  </Project>
+  <Project Path="ext/editorconfig-core/editorconfig.vcxproj" Id="ddecdf19-8125-4efe-bf88-72a61af8ff4b">
+    <BuildType Solution="Debug|ARM64" Project="Release" />
+  </Project>
+  <Project Path="ext/scintilla/Scintilla.vcxproj" Id="5877b917-512b-49f5-b514-1b4159e7a9ca" />
+  <Project Path="src/BowPad.vcxproj" Id="f767677d-b0fe-4c4f-b886-09e501c543b2">
+    <BuildType Solution="Debug|ARM64" Project="Release" />
+    <Deploy Solution="*|Win32" />
+    <Deploy Solution="*|x64" />
+  </Project>
+  <Project Path="src/ExplorerCommandVerb/ExplorerCommandVerb.vcxproj" Id="585a1606-dc66-49ba-bffb-e6f0b63a66bf" />
+  <Project Path="src/ResourceDll.vcxproj" Id="26dd7834-6269-413c-960a-aa7ccb72243c">
+    <BuildType Solution="Debug|ARM64" Project="Release" />
+    <Build Solution="Debug|ARM64" Project="false" />
+    <Build Solution="Debug|x64" Project="false" />
+  </Project>
+</Solution>
