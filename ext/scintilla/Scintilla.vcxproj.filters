@@ -791,6 +791,12 @@
     <ClCompile Include="win32\SurfaceGDI.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexEscSeq.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lexilla\lexers\LexSINEX.cxx">
+      <Filter>Lexilla\lexers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\lexilla\include\LexicalStyles.iface">

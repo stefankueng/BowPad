@@ -262,6 +262,7 @@
     <ClCompile Include="..\lexilla\lexers\LexErlang.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexErrorList.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexEScript.cxx" />
+    <ClCompile Include="..\lexilla\lexers\LexEscSeq.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexFlagship.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexForth.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexFortran.cxx" />
@@ -321,6 +322,7 @@
     <ClCompile Include="..\lexilla\lexers\LexRust.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexSAS.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexScriptol.cxx" />
+    <ClCompile Include="..\lexilla\lexers\LexSINEX.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexSmalltalk.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexSML.cxx" />
     <ClCompile Include="..\lexilla\lexers\LexSorcus.cxx" />
