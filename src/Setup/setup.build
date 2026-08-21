@@ -59,6 +59,8 @@
     </exec>
     <if test="${file::exists('..\..\signinfo.txt')}">
         <exec program="${signtool}">
+            <arg value="-pin" if="${signtoolpin != ''}" />
+            <arg value="${signtoolpin}" if="${signtoolpin != ''}" />
             <arg value="sign" />
             <arg value="${signinfo}" />
             <arg value="..\..\bin\release64\bin\package.msix" />
@@ -75,6 +77,8 @@
     </exec>
     <if test="${file::exists('..\..\signinfo.txt')}">
         <exec program="${signtool}">
+            <arg value="-pin" if="${signtoolpin != ''}" />
+            <arg value="${signtoolpin}" if="${signtoolpin != ''}" />
             <arg value="sign" />
             <arg value="${signinfo}" />
             <arg value="..\..\bin\releaseARM64\bin\package.msix" />
@@ -109,6 +113,8 @@
     </delete>
     <if test="${file::exists('..\..\signinfo.txt')}">
       <exec program="${signtool}">
+        <arg value="-pin" if="${signtoolpin != ''}" />
+        <arg value="${signtoolpin}" if="${signtoolpin != ''}" />
         <arg value="sign" />
         <arg value="${signinfo}" />
         <arg value="..\..\bin\${msifilename}.msi" />
@@ -144,6 +150,8 @@
     </delete>
     <if test="${file::exists('..\..\signinfo.txt')}">
       <exec program="${signtool}">
+        <arg value="-pin" if="${signtoolpin != ''}" />
+        <arg value="${signtoolpin}" if="${signtoolpin != ''}" />
         <arg value="sign" />
         <arg value="${signinfo}" />
         <arg value="..\..\bin\${msifilename64}.msi" />
@@ -179,6 +187,8 @@
     </delete>
     <if test="${file::exists('..\..\signinfo.txt')}">
       <exec program="${signtool}">
+        <arg value="-pin" if="${signtoolpin != ''}" />
+        <arg value="${signtoolpin}" if="${signtoolpin != ''}" />
         <arg value="sign" />
         <arg value="${signinfo}" />
         <arg value="..\..\bin\${msifilenameARM64}.msi" />

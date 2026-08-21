@@ -4,6 +4,7 @@
   <include buildfile="default.build.user" />
 
   <property name="signtool" value="signtool.exe" />
+  <property name="signtoolpin" value="" />
   <property name="configuration" value="release" />
 
   <!-- the signinfo.txt file has to contain one line with parameters for signtool.exe,
@@ -30,7 +31,7 @@
       Cleans every subproject.
     </description>
     <exec program="msbuild.exe" >
-      <arg value="BowPad.sln" />
+      <arg value="BowPad.slnx" />
       <arg value="/t:Clean" />
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=win32" />
@@ -38,7 +39,7 @@
       <arg value="/maxcpucount" />
     </exec>
     <exec program="msbuild.exe" >
-      <arg value="BowPad.sln" />
+      <arg value="BowPad.slnx" />
       <arg value="/t:Clean" />
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=x64" />
@@ -46,7 +47,7 @@
       <arg value="/maxcpucount" />
     </exec>
     <exec program="msbuild.exe" >
-      <arg value="BowPad.sln" />
+      <arg value="BowPad.slnx" />
       <arg value="/t:Clean" />
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=ARM64" />
@@ -85,7 +86,7 @@
       Builds BowPad.
     </description>
     <exec program="msbuild.exe" >
-      <arg value="BowPad.sln" />
+      <arg value="BowPad.slnx" />
       <arg value="/t:Rebuild" />
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=win32" />
@@ -93,7 +94,7 @@
       <arg value="/maxcpucount" />
     </exec>
     <exec program="msbuild.exe" >
-      <arg value="BowPad.sln" />
+      <arg value="BowPad.slnx" />
       <arg value="/t:Rebuild" />
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=x64" />
@@ -101,7 +102,7 @@
       <arg value="/maxcpucount" />
     </exec>
     <exec program="msbuild.exe" >
-      <arg value="BowPad.sln" />
+      <arg value="BowPad.slnx" />
       <arg value="/t:Rebuild" />
       <arg value="/p:Configuration=${configuration}" />
       <arg value="/p:Platform=ARM64" />
