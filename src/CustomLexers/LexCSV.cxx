@@ -91,12 +91,12 @@ public:
         return 0;
     }
 
-    const char* SCI_METHOD DescribeProperty(const char* name) override
+    const char* SCI_METHOD DescribeProperty(const char* /*name*/) override
     {
         return nullptr;
     }
 
-    const char* SCI_METHOD  PropertyGet(const char* key) override
+    const char* SCI_METHOD  PropertyGet(const char* /*key*/) override
     {
         return nullptr;
     }
@@ -129,7 +129,6 @@ public:
 
 void SCI_METHOD LexerCSV::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument* pAccess)
 {
-    bool         numberIsHex = false;
     size_t       lineSize    = 1000;
     auto         line        = std::make_unique<char[]>(lineSize);
 
