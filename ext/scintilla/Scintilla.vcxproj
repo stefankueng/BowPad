@@ -461,6 +461,7 @@
     <ClInclude Include="src\PositionCache.h" />
     <ClInclude Include="src\RESearch.h" />
     <ClInclude Include="src\RunStyles.h" />
+    <ClInclude Include="src\RunThreads.h" />
     <ClInclude Include="src\ScintillaBase.h" />
     <ClInclude Include="src\Selection.h" />
     <ClInclude Include="src\SparseVector.h" />

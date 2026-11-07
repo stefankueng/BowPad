@@ -258,6 +258,9 @@
     <ClInclude Include="win32\SurfaceGDI.h">
       <Filter>Scintilla\win32</Filter>
     </ClInclude>
+    <ClInclude Include="src\RunThreads.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lexilla\lexers\LexSQL.cxx">

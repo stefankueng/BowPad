@@ -1,6 +1,4 @@
 repo: bdf8c3ef2fb01ea24578e726337888e706d10b92
-node: 9a25e676e081f3f45f645a100a964c9cd39de964
+node: 69bed9304d290ba16399e493ab6fe4b1a3fb4b5f
 branch: default
-latesttag: rel-5-6-1
-latesttagdistance: 1
-changessincelatesttag: 1
+tag: rel-5-6-9
