@@ -167,7 +167,7 @@ private:
     void                             HandleGetDispInfo(int tab, LPNMTTDISPINFO lpNmtdi);
     void                             HandleTreePath(const std::wstring& path, bool isDir, bool isDot);
     static std::vector<std::wstring> GetFileListFromGlobPath(const std::wstring& path);
-
+    void                             resolveLnkFile(std::wstring& file);
     // Scintilla events.
     void                             HandleDwellStart(const SCNotification& scn);
     LPARAM                           HandleMouseMsg(const SCNotification& scn);

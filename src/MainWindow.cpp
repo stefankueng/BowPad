@@ -57,6 +57,8 @@
 #include <dwmapi.h>
 #include <fstream>
 #include <format>
+#include <wrl.h>
+using Microsoft::WRL::ComPtr;
 
 IUIFramework* g_pFramework = nullptr; // Reference to the Ribbon framework.
 
@@ -841,7 +843,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                             }
                             m_editor.Scintilla().GetLine(line, pLine.get());
                             pLine[curLineSize - eolBytes] = 0;
-                            if ( curLineSize - eolBytes - 1 > 0 && (pLine[curLineSize - eolBytes - 1] == '\r' || pLine[curLineSize - eolBytes - 1] == '\n'))
+                            if (curLineSize - eolBytes - 1 > 0 && (pLine[curLineSize - eolBytes - 1] == '\r' || pLine[curLineSize - eolBytes - 1] == '\n'))
                             {
                                 pLine[curLineSize - eolBytes - 1] = 0;
                                 --curLineSize;
@@ -863,7 +865,7 @@ LRESULT CALLBACK CMainWindow::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wParam,
                                 m_editor.Scintilla().EOLAnnotationSetText(line, nullptr);
                         }
                         m_annotationsLastStartLine = startLine;
-                        m_annotationsLastEndLine = endLine;
+                        m_annotationsLastEndLine   = endLine;
                     }
                 }
                 break;
@@ -1362,7 +1364,9 @@ void CMainWindow::HandleTreePath(const std::wstring& path, bool isDir, bool isDo
         unsigned int openFlags = OpenFlags::AddToMRU;
         if (control)
             openFlags |= OpenFlags::OpenIntoActiveTab;
-        OpenFile(path, openFlags);
+        auto p = path;
+        resolveLnkFile(p);
+        OpenFile(p, openFlags);
     }
 }
 
@@ -1386,6 +1390,47 @@ std::vector<std::wstring> CMainWindow::GetFileListFromGlobPath(const std::wstrin
     }
 
     return results;
+}
+
+void CMainWindow::resolveLnkFile(std::wstring& file)
+{
+    if (GetKeyState(VK_SHIFT) & 0x8000)
+        return;
+
+    if (_wcsicmp(CPathUtils::GetFileExtension(file).c_str(), L"lnk") == 0)
+    {
+        wchar_t targetFilePath[MAX_PATH]{};
+
+        HRESULT hres = CoInitialize(NULL);
+        if (SUCCEEDED(hres))
+        {
+            ComPtr<IShellLink> psl = nullptr;
+            hres            = CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
+            if (SUCCEEDED(hres))
+            {
+                ComPtr<IPersistFile> ppf = nullptr;
+                hres                      = psl->QueryInterface(IID_IPersistFile, (void**)&ppf);
+                if (SUCCEEDED(hres))
+                {
+                    hres = ppf->Load(file.c_str(), STGM_READ);
+                    if (SUCCEEDED(hres))
+                    {
+                        hres = psl->Resolve(nullptr, 0);
+                        if (SUCCEEDED(hres))
+                        {
+                            WIN32_FIND_DATA wfd{};
+                            hres = psl->GetPath(targetFilePath, MAX_PATH, (WIN32_FIND_DATA*)&wfd, SLGP_SHORTPATH);
+                            if (SUCCEEDED(hres))
+                            {
+                                file = targetFilePath;
+                            }
+                        }
+                    }
+                }
+            }
+            CoUninitialize();
+        }
+    }
 }
 
 void CMainWindow::HandleStatusBar(WPARAM wParam, LPARAM lParam)
@@ -1889,7 +1934,7 @@ void CMainWindow::ResizeChildWindows()
 {
     RECT rect;
     GetClientRect(*this, &rect);
-    if (!IsRectEmpty(&rect) )
+    if (!IsRectEmpty(&rect))
     {
         constexpr UINT flags       = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOCOPYBITS;
         constexpr UINT noShowFlags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOCOPYBITS;
@@ -2557,9 +2602,12 @@ bool CMainWindow::CloseAllTabs(bool quitting)
 
 void CMainWindow::SetFileToOpen(const std::wstring& path, size_t line)
 {
-    auto list = GetFileListFromGlobPath(path);
-    for (const auto p : list)
+    auto list         = GetFileListFromGlobPath(path);
+    auto shiftPressed = (::GetKeyState(VK_SHIFT) & 0x8000) != 0;
+    for (auto p : list)
     {
+        if (!shiftPressed)
+            resolveLnkFile(p);
         m_pathsToOpen[p] = line;
     }
 }
@@ -3400,7 +3448,7 @@ void CMainWindow::HandleSavePoint(const SCNotification& scn)
     auto docID = m_tabBar.GetCurrentTabId();
     if (m_docManager.HasDocumentID(docID))
     {
-        auto& doc      = m_docManager.GetModDocumentFromID(docID);
+        auto& doc = m_docManager.GetModDocumentFromID(docID);
         if (!doc.m_bTailing)
         {
             doc.m_bIsDirty = scn.nmhdr.code == SCN_SAVEPOINTLEFT;
@@ -3443,8 +3491,8 @@ void CMainWindow::AddHotSpots() const
     if (startPos < 0 || endPos < 0)
         return;
     // to speed up the search, first search for "://" without using the regex engine
-    auto fStartPos        = startPos;
-    auto fEndPos          = endPos;
+    auto fStartPos = startPos;
+    auto fEndPos   = endPos;
     m_editor.Scintilla().SetSearchFlags(Scintilla::FindOption::None);
     m_editor.Scintilla().SetTargetStart(fStartPos);
     m_editor.Scintilla().SetTargetEnd(fEndPos);
@@ -3941,12 +3989,16 @@ void CMainWindow::HandleDropFiles(HDROP hDrop)
         return;
     int                       filesDropped = DragQueryFile(hDrop, 0xffffffff, nullptr, 0);
     std::vector<std::wstring> files;
+    bool                      shiftIsPressed = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
     for (int i = 0; i < filesDropped; ++i)
     {
         UINT len     = DragQueryFile(hDrop, i, nullptr, 0);
         auto pathBuf = std::make_unique<wchar_t[]>(len + 2LL);
         DragQueryFile(hDrop, i, pathBuf.get(), len + 1);
-        files.push_back(pathBuf.get());
+        std::wstring path = pathBuf.get();
+        if (!shiftIsPressed)
+            resolveLnkFile(path);
+        files.push_back(std::move(path));
     }
 
     if (files.size() == 1)
