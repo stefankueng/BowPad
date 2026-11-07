@@ -438,8 +438,8 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                             {
                                 // let Scintilla handle all caret positions not at the EOL
                                 if (prevWndProc)
-                                    CallWindowProc(prevWndProc, hwnd, uMsg, wParam, lParam);
-                                DefWindowProc(hwnd, uMsg, wParam, lParam);
+                                    return CallWindowProc(prevWndProc, hwnd, uMsg, wParam, lParam);
+                                return DefWindowProc(hwnd, uMsg, wParam, lParam);
                             }
 
                             // now handle the carets at the EOL: we just delete the EOL characters, which effectively merges the line with the next one
@@ -456,6 +456,7 @@ LRESULT CALLBACK CScintillaWnd::WinMsgHandler(HWND hwnd, UINT uMsg, WPARAM wPara
                                 Scintilla().SetSelectionNEnd(i.selIndex, posStart);
                             }
                             Scintilla().EndUndoAction();
+                            return 0;
                         }
                     }
                 }
